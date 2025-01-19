@@ -1,0 +1,47 @@
+/* PrivacyPolicy.css */
+.policy-container {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    font-family: 'Arial', sans-serif;
+    text-align: right; /* لجعل النص من اليمين لليسار */
+    direction: rtl; /* دعم الكتابة بالعربية */
+  }
+  
+  .policy-title {
+    font-size: 36px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .policy-heading {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 20px;
+  }
+  
+  .policy-text {
+    font-size: 16px;
+    line-height: 1.8;
+    margin-top: 10px;
+  }
+  
+  @media (max-width: 600px) {
+    .policy-container {
+      padding: 10px;
+    }
+  
+    .policy-title {
+      font-size: 28px;
+    }
+  
+    .policy-heading {
+      font-size: 20px;
+    }
+  
+    .policy-text {
+      font-size: 14px;
+    }
+  }
+  

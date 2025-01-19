@@ -1,0 +1,63 @@
+.container {
+    padding: 15px;
+  }
+  
+  .heading {
+    font-size: 18px;
+    font-family: 'droidAr'; /* Ensure this font exists in your project */
+    margin-bottom: 10px;
+    color: #333;
+  }
+  
+  .cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding-bottom: 20px;
+  }
+  
+  .cardSimmilar {
+    background-color: #fff;
+    border-radius: 10px;
+    width: 200px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    text-decoration: none;
+  }
+  
+  .card-image-container {
+    width: 100%;
+  }
+  
+  .card-image {
+    width: 100%;
+    height: 120px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    object-fit: cover;
+  }
+  
+  .card-details {
+    padding: 10px;
+  }
+  
+  .card-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    text-align: right; /* Right-aligned for Arabic text */
+  }
+  
+  .card-price {
+    font-size: 16px;
+    font-weight: bold;
+    color: #467c9e; /* You can change this to your primary color */
+    margin-top: 5px;
+  }
+  
+  .card-address {
+    font-size: 12px;
+    color: #888;
+    margin-top: 5px;
+  }
+  

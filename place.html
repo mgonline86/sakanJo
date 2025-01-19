@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>جار تحميل ...</title>
+    <!-- Placeholder title while fetching data -->
+    <style>
+      /* Set html and body to occupy the full height of the viewport */
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      /* Style the iframe to fill the entire viewport */
+      iframe {
+        width: 100%;
+        height: 100%;
+        border: none; /* Remove the border */
+      }
+
+      /* Ensure no extra margins or padding on all elements */
+      * {
+        box-sizing: border-box;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      // Function to get query parameters by name
+      function getQueryParam(name) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name);
+      }
+
+      // Function to dynamically set meta tags in the head
+      function setMetaTags(place, photos) {
+        // Update the document title
+        document.title = place.title || 'Place Details';
+
+        // Meta tag properties
+        const metaTags = [
+          { name: 'description', content: place.description },
+          { property: 'og:title', content: place.title },
+          { property: 'og:description', content: place.description },
+          {
+            property: 'og:image',
+            content: `https://backend.sakanijo.com/api/images/${place.folderName}/${photos[0]}`,
+          },
+          {
+            property: 'og:url',
+            content: `https://sakanijo.com/place/${place.id}`,
+          },
+        ];
+
+        // Create and append meta tags
+        metaTags.forEach((tag) => {
+          const meta = document.createElement('meta');
+          if (tag.name) {
+            meta.setAttribute('name', tag.name);
+          }
+          if (tag.property) {
+            meta.setAttribute('property', tag.property);
+          }
+          meta.setAttribute('content', tag.content);
+          document.head.appendChild(meta);
+        });
+      }
+
+      // Fetch place data and set meta tags
+      async function fetchPlaceData() {
+        // Get the 'id' parameter from the URL
+        const placeId = getQueryParam('id');
+
+        if (placeId) {
+          try {
+            // Fetch place data from the API
+            const response = await fetch(
+              `https://backend.sakanijo.com/api/places/${placeId}`,
+            );
+            const place = await response.json();
+
+            // Assume 'photos' is an array in the response
+            const photos = place.photos || [];
+
+            // Set meta tags with the fetched place data
+            setMetaTags(place, photos);
+
+            // Create and append iframe
+            const iframe = document.createElement('iframe');
+            iframe.src = `https://sakanijo.com/place/${placeId}`;
+            document.body.appendChild(iframe);
+          } catch (error) {
+            // Handle errors if the fetch fails
+            console.error('Error fetching place data:', error);
+            const errorMessage = document.createElement('p');
+            errorMessage.textContent = 'Error fetching place details.';
+            document.body.appendChild(errorMessage);
+          }
+        } else {
+          // If the 'id' parameter is not found, display an error message
+          const errorMessage = document.createElement('p');
+          errorMessage.textContent = 'Place ID not found in the URL.';
+          document.body.appendChild(errorMessage);
+        }
+      }
+
+      // Call the function to fetch place data and set meta tags
+      fetchPlaceData();
+    </script>
+  </body>
+</html>
