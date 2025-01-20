@@ -128,7 +128,7 @@ const PlacePage = () => {
                   </Button>
                 }
 
-                <ShareButton shareLink={`https://place.sakanijo.com/place?id=${place?.id}`} />
+                <ShareButton shareLink={`/place/${place?.id}`} />
               </div>
 
             )}

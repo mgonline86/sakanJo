@@ -31,7 +31,7 @@ const SimilarProducts = ({ homeType, sellType, placeId }) => {
         {similarAds.map((item) => {
           const photos = item.photos ? item.photos.split(",") : [];
           return (
-            <Link key={item.id} to={`https://place.sakanijo.com/place?id=${item?.id}`} className="cardSimmilar">
+            <Link key={item.id} to={`/place/${item?.id}`} className="cardSimmilar">
               <div className="card-image-container">
                 <img
                   src={`https://backend.sakanijo.com/api/images/${encodeURIComponent(item.folderName)}/${encodeURIComponent(photos[0])}`}
