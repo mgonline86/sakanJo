@@ -158,7 +158,7 @@ const LoginPage = () => {
                   handleFormData(e);
                 }}
                 required
-                maxLength={9}
+                maxLength={10}
                 autoComplete="tel"
               />
             </div>
