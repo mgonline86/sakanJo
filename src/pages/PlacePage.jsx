@@ -11,6 +11,8 @@ import ShareButton from "@/components/ShareModal"
 import SimilarProducts from "@/components/SimmilarPosts"
 import { Box, Typography } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import { Button } from '@/components/ui/button';
+import { Phone, WhatsApp } from '@mui/icons-material';
 
 const PlacePage = () => {
   const { id } = useParams();
@@ -47,6 +49,7 @@ const PlacePage = () => {
   if (!place) {
     return;
   }
+  console.log("place:",place);
 
   const photos = place.photos?.split(',');
 
@@ -103,38 +106,28 @@ const PlacePage = () => {
             {place.sellingMethod === 'booking' ? (
               <BookingWidget place={place} />
             ) : (
-              <>
-              <a href={`tel:${place?.ownerPhone}`}>
-                <button className="button-68">
-                  <p
-                    style={{ fontSize: 20, fontWeight: 'bold', color: 'white' }}
-                  >
-                    {place?.ownerPhone}
-                  </p>
-                  </button>
-                 
-               
-              </a>
-              <br></br>
-              <div style={{display:"flex" , justifyContent: "flex-start" , gap:"10px"}}>
-              {
-                place?.gettingCalls === "whatsapp" && (
-                  <a href={`https://wa.me/${place.ownerPhone}`}  target='_blank' >
-                  <button className="button-68" style={{marginTop : 10 , backgroundColor:"transparent" ,
-                   borderWidth:"3px" , borderStyle:"solid" , borderColor:"#27ae60" , display:'flex' , alignItems:'center' , justifyContent:"center" , gap : 10 , width : 120 , height:60}}>
-                  <p
-                    style={{ fontSize: 18, fontWeight: 'bold', color: '#27ae60' }}
-                  >
-                    واتساب
-                  </p>
-                  </button>
+              <div className='flex justify-center gap-2 flex-wrap md:justify-start'>
+                {
+                  place?.ownerPhone &&
+                  <Button variant="outline" asChild className="rounded-full h-10 w-10 text-primary hover:bg-primary hover:text-primary-foreground">
+                    <a href={`tel:${place?.ownerPhone}`}>
+                      <Phone />
+                    </a>
+                  </Button>
+                }
 
-                  </a>
-                )
-              }
-            <ShareButton  shareLink={`https://place.sakanijo.com/place?id=${place?.id}`} />
-            </div>
-                  </>
+                {
+                  (place?.ownerPhone  && place?.gettingCalls === "whatsapp") && 
+                  <Button variant="outline" asChild className="rounded-full h-10 w-10 text-[#25D366] hover:bg-[#25D366] hover:text-white">
+                    <a href={`https://wa.me/${place.ownerPhone}`}  target='_blank' rel="noopener noreferrer" >
+                      <WhatsApp />
+                    </a>
+                  </Button>
+                }
+
+                <ShareButton shareLink={`https://place.sakanijo.com/place?id=${place?.id}`} />
+              </div>
+
             )}
             
           </div>
