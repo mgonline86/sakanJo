@@ -37,7 +37,7 @@ export const useProvideAuth = () => {
    
 
     if (!/^\+9620?7[789]\d{7}$/.test(phone)) {
-      return res.status(400).json({ message: "رقم الهاتف الأردني غير صحيح" });
+      return { success: false, message: "رقم الهاتف الأردني غير صحيح" };
   }
   
 
