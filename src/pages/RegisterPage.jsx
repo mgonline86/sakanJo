@@ -77,7 +77,7 @@ const RegisterPage = () => {
     setLoading(false);
   };
 
-  const [isVerification, setIsVerification] = useState(true);
+  const [isVerification, setIsVerification] = useState(false);
   const [OTP, setOTP] = useState('');
 
   const handleChange = (e) => {
