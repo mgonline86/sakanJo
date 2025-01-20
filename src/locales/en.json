@@ -136,7 +136,10 @@
   "select_or_drag_some_pics_t": "Select or drag some pics",
   "product_name_t": "Product Name",
 
-  "product_type_t": "Product Type"
+  "product_type_t": "Product Type",
+
+  "please_fill_all_inputs": "Please fill all inputs",
+  "invalid_phone_number": "Invalid phone number"
 
 
 }

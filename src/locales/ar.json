@@ -178,7 +178,10 @@
         "kitchens": "عدد المطابخ",
         "bathrooms": "عدد الحمامات"
       },
-      "submit": "حفظ المنتج"
+      "submit": "حفظ المنتج",
+      
+      "please_fill_all_inputs": "الرجاء تعبئة جميع الحقول",
+      "invalid_phone_number": "رقم هاتف غير صحيح"
     
     
 }
