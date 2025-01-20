@@ -1,4 +1,5 @@
 {
+    "app_name" : "Sakani" ,
     "searchPlaceHolder" : "Search" ,
     "searchBtn" : "search"  ,
     "myProfile" : "My Profile" ,
@@ -12,7 +13,7 @@
     "night" : "night" ,
     "Your booking information" : "Your booking information" ,
     "Show all photos" : "Show all photos" ,
-    "Add new place" : "Add new Ad" ,
+    "Add new place" : "Add New Ad" ,
     "If you want to set deferent of types about your place , please download our app in app store or play store" : "If you want to set deferent of types about your place , please download our app in app store or play store",
     "Type"  : "Type"  ,
     "Title": "Title" ,
@@ -135,7 +136,10 @@
   "select_or_drag_some_pics_t": "Select or drag some pics",
   "product_name_t": "Product Name",
 
-  "product_type_t": "Product Type"
+  "product_type_t": "Product Type",
+
+  "please_fill_all_inputs": "Please fill all inputs",
+  "invalid_phone_number": "Invalid phone number"
 
 
 }

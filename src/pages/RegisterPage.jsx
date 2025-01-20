@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import Spinner from '@/components/ui/Spinner';
+import { Button } from '@/components/ui/button';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import axios from 'axios';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next'; // Import useTranslation
 import { Link, Navigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../hooks';
 import './main.css';
-import axios from 'axios';
-import Spinner from '@/components/ui/Spinner';
-import { useTranslation } from 'react-i18next'; // Import useTranslation
 
 const RegisterPage = () => {
   const { t } = useTranslation(); // Initialize useTranslation
@@ -17,6 +19,7 @@ const RegisterPage = () => {
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState(null);
   const [redirect, setRedirect] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const auth = useAuth();
 
   const handleFormData = (e) => {
@@ -24,8 +27,39 @@ const RegisterPage = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const validateForm = () => {
+    // Trim the form data
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      name: prevFormData.name.trim(),
+      phone: prevFormData.phone.trim(),
+      password: prevFormData.password.trim(),
+    }));
+
+    // Check if any field is empty
+    if (!formData.name || !formData.phone || !formData.password) {
+      toast.error(t('please_fill_all_inputs'));
+      return false;
+    }
+
+    // Check if phone number is valid
+    const phone = `+962${formData.phone}`;
+    if (!/^\+9620?7[789]\d{7}$/.test(phone)) {
+      toast.error(t('invalid_phone_number'));
+      return false;
+    }
+
+    return true;
+  };
+
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+    const isValid = validateForm();
+
+    if (!isValid) {
+      return;
+    }
+
     setLoading(true);
     const response = await auth.register(formData);
 
@@ -44,20 +78,12 @@ const RegisterPage = () => {
   };
 
   const [isVerification, setIsVerification] = useState(false);
-  const [inputValues, setInputValues] = useState({
-    input1: '',
-    input2: '',
-    input3: '',
-    input4: '',
-  });
+  const [OTP, setOTP] = useState('');
 
   const handleChange = (e) => {
-    const { id, value } = e.target;
-    if (value.length <= 1) {
-      setInputValues({
-        ...inputValues,
-        [id]: value,
-      });
+    const { value } = e.target;
+    if (value.length <= 4) {
+      setOTP(value.trim().replace(/[^0-9]/g, ''));
     }
   };
 
@@ -66,8 +92,7 @@ const RegisterPage = () => {
   };
 
   const sendOtp = () => {
-    const otpValue = getCombinedValue();
-    if (!otpValue) {
+    if (!OTP) {
       toast.error(t('please_enter_otp_code'));
     } else {
       let phone = formData.phone;
@@ -77,7 +102,7 @@ const RegisterPage = () => {
       axios
         .post('https://backend.sakanijo.com/verify-phone', {
           phone: phone,
-          code: otpValue,
+          code: OTP,
         })
         .then((response) => {
           if (response.data.message) {
@@ -121,21 +146,49 @@ const RegisterPage = () => {
               placeholder={t('full_name')}
               value={formData.name}
               onChange={handleFormData}
+              required
+              autoComplete="name"
             />
-            <input
-              name="phone"
-              type="tel"
-              placeholder="+962"
-              value={formData.phone}
-              onChange={handleFormData}
-            />
-            <input
-              name="password"
-              type="password"
-              placeholder={t('password')}
-              value={formData.password}
-              onChange={handleFormData}
-            />
+            <div className="flex items-center">
+              <span className="rounded-e-none rounded-s-md border bg-gray-100 p-2">
+                +962
+              </span>
+              <input
+                name="phone"
+                type="tel"
+                placeholder="05xxxxxxxx"
+                className="rounded-s-none border-s-0"
+                value={formData.phone}
+                onChange={(e) => {
+                  e.target.value = e.target.value.replace(/[^\d]/g, '');
+                  handleFormData(e);
+                }}
+                required
+                maxLength={10}
+                autoComplete="tel"
+              />
+            </div>
+            <div className="flex items-center">
+              <input
+                name="password"
+                type={showPassword ? 'text' : 'password'}
+                placeholder={t('password')}
+                value={formData.password}
+                onChange={handleFormData}
+                className="rounded-e-none"
+                autoComplete="new-password"
+                required
+                minLength={8}
+              />
+              <Button
+                variant="outline"
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="rounded-s-none border-s-0 py-5"
+              >
+                {showPassword ? <VisibilityOff /> : <Visibility />}
+              </Button>
+            </div>
             <button className="primary my-2">{t('create_account')}</button>
             {loading ? <Spinner /> : null}
           </form>
@@ -162,37 +215,23 @@ const RegisterPage = () => {
           <p className="message">{t('otp_sent_message')}</p>
           <div className="inputs">
             <input
-              id="input1"
+              name="otp"
               type="text"
-              maxLength="1"
-              value={inputValues.input1}
+              minLength="4"
+              maxLength="4"
+              value={OTP}
               onChange={handleChange}
-            />
-            <input
-              id="input2"
-              type="text"
-              maxLength="1"
-              value={inputValues.input2}
-              onChange={handleChange}
-            />
-            <input
-              id="input3"
-              type="text"
-              maxLength="1"
-              value={inputValues.input3}
-              onChange={handleChange}
-            />
-            <input
-              id="input4"
-              type="text"
-              maxLength="1"
-              value={inputValues.input4}
-              onChange={handleChange}
+              className="text-xl"
             />
           </div>
-          <button className="action" onClick={sendOtp}>
+          <Button
+            type="button"
+            className="action mx-auto min-w-24"
+            onClick={sendOtp}
+            disabled={OTP.length < 4}
+          >
             {t('verify')}
-          </button>
+          </Button>
         </div>
       ) : null}
     </>
