@@ -216,7 +216,7 @@ const RegisterPage = () => {
           <div className="inputs">
             <input
               name="otp"
-              type="number"
+              type="text"
               minLength="4"
               maxLength="4"
               value={OTP}

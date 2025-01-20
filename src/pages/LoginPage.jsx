@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next'; // Import useTranslation
 import { Link, Navigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { useTranslation } from 'react-i18next'; // Import useTranslation
 
-import ProfilePage from './ProfilePage';
-import { useAuth } from '../../hooks';
-import './main.css';
-import axios from 'axios';
 import Spinner from '@/components/ui/Spinner';
+import { Button } from '@/components/ui/button';
+import axios from 'axios';
+import { useAuth } from '../../hooks';
+import ProfilePage from './ProfilePage';
+import './main.css';
 
 const LoginPage = () => {
   const { t } = useTranslation(); // Initialize the translation hook
@@ -17,20 +18,12 @@ const LoginPage = () => {
   const [isVerification, setIsVerification] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const [inputValues, setInputValues] = useState({
-    input1: '',
-    input2: '',
-    input3: '',
-    input4: '',
-  });
+  const [OTP, setOTP] = useState('');
 
   const handleChange = (e) => {
-    const { id, value } = e.target;
-    if (value.length <= 1) {
-      setInputValues({
-        ...inputValues,
-        [id]: value,
-      });
+    const { value } = e.target;
+    if (value.length <= 4) {
+      setOTP(value.trim().replace(/[^0-9]/g, ''));
     }
   };
 
@@ -41,8 +34,7 @@ const LoginPage = () => {
   useEffect(() => {}, []);
 
   const sendOtp = () => {
-    const otpValue = getCombinedValue();
-    if (!otpValue) {
+    if (!OTP) {
       toast.error(t('please_enter_otp'));
     } else {
       let phone = formData.phone;
@@ -52,7 +44,7 @@ const LoginPage = () => {
       axios
         .post('https://backend.sakanijo.com/verify-phone', {
           phone: phone,
-          code: otpValue,
+          code: OTP,
         })
         .then((response) => {
           if (response.data.message) {
@@ -70,7 +62,7 @@ const LoginPage = () => {
             error.response.data &&
             error.response.data.message
           ) {
-            console.log("error",error.response)
+            console.log('error', error.response);
             toast.error(error.response.data.message);
           } else {
             toast.error(t('error_verifying_otp'));
@@ -86,8 +78,39 @@ const LoginPage = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const validateForm = () => {
+    // Trim the form data
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      phone: prevFormData.phone.trim(),
+      password: prevFormData.password.trim(),
+    }));
+
+    // Check if any field is empty
+    if (!formData.phone || !formData.password) {
+      toast.error(t('please_fill_all_inputs'));
+      return false;
+    }
+
+    // Check if phone number is valid
+    const phone = `+962${formData.phone}`;
+    if (!/^\+9620?7[789]\d{7}$/.test(phone)) {
+      toast.error(t('invalid_phone_number'));
+      return false;
+    }
+
+    return true;
+  };
+
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+
+    const isValid = validateForm();
+
+    if (!isValid) {
+      return;
+    }
+
     setLoading(true);
     const response = await auth.login(formData);
     if (response?.message === 'تم إرسال رمز التحقق مرة أخرى.') {
@@ -97,7 +120,7 @@ const LoginPage = () => {
         toast.success(response.message);
         setRedirect(true);
       } else {
-        console.log(response)
+        console.log(response);
         toast.error(response.message);
       }
     }
@@ -120,19 +143,33 @@ const LoginPage = () => {
             {t('login_button')}
           </h1>
           <form className="mx-auto max-w-md" onSubmit={handleFormSubmit}>
-            <input
-              name="phone"
-              type="tel"
-              placeholder={t('phone_placeholder')}
-              value={formData.phone}
-              onChange={handleFormData}
-            />
+            <div className="flex items-center">
+              <span className="rounded-e-none rounded-s-md border bg-gray-100 p-2">
+                +962
+              </span>
+              <input
+                name="phone"
+                type="tel"
+                placeholder={t('phone_placeholder')}
+                className="rounded-s-none border-s-0"
+                value={formData.phone}
+                onChange={(e) => {
+                  e.target.value = e.target.value.replace(/[^\d]/g, '');
+                  handleFormData(e);
+                }}
+                required
+                maxLength={9}
+                autoComplete="tel"
+              />
+            </div>
             <input
               name="password"
               type="password"
               placeholder={t('password')}
               value={formData.password}
               onChange={handleFormData}
+              required
+              autoComplete="current-password"
             />
             <button className="primary my-4">{t('login_button')}</button>
             {loading ? <Spinner /> : null}
@@ -160,37 +197,23 @@ const LoginPage = () => {
           <p className="message">{t('otp_message')}</p>
           <div className="inputs">
             <input
-              id="input1"
+              name="otp"
               type="text"
-              maxLength="1"
-              value={inputValues.input1}
+              minLength="4"
+              maxLength="4"
+              value={OTP}
               onChange={handleChange}
-            />
-            <input
-              id="input2"
-              type="text"
-              maxLength="1"
-              value={inputValues.input2}
-              onChange={handleChange}
-            />
-            <input
-              id="input3"
-              type="text"
-              maxLength="1"
-              value={inputValues.input3}
-              onChange={handleChange}
-            />
-            <input
-              id="input4"
-              type="text"
-              maxLength="1"
-              value={inputValues.input4}
-              onChange={handleChange}
+              className="text-xl"
             />
           </div>
-          <button className="action" onClick={sendOtp}>
-            {t('verify_me')}
-          </button>
+          <Button
+            type="button"
+            className="action mx-auto min-w-24"
+            onClick={sendOtp}
+            disabled={OTP.length < 4}
+          >
+            {t('verify')}
+          </Button>
         </div>
       ) : null}
     </>
