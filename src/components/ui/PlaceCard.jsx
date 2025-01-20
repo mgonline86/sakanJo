@@ -14,7 +14,7 @@ const PlaceCard = ({ place }) => {
 
   return (
     <a
-      href={`https://place.sakanijo.com/place?id=${id}`}
+      href={`/place/${id}`}
       className="m-4 flex flex-col md:m-2 xl:m-0"
     >
       <div className="card  relative">
