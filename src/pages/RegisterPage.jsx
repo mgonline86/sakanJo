@@ -61,9 +61,6 @@ const RegisterPage = () => {
       return;
     }
 
-    alert('valid');
-    return;
-
     setLoading(true);
     const response = await auth.register(formData);
 
