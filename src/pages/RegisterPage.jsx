@@ -1,10 +1,9 @@
-import { Button } from '@/components/ui/button';
 import Spinner from '@/components/ui/Spinner';
+import { Button } from '@/components/ui/button';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import axios from 'axios';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next'; // Import useTranslation
-import 'react-phone-number-input/style.css';
 import { Link, Navigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../hooks';
@@ -78,21 +77,13 @@ const RegisterPage = () => {
     setLoading(false);
   };
 
-  const [isVerification, setIsVerification] = useState(false);
-  const [inputValues, setInputValues] = useState({
-    input1: '',
-    input2: '',
-    input3: '',
-    input4: '',
-  });
+  const [isVerification, setIsVerification] = useState(true);
+  const [OTP, setOTP] = useState('');
 
   const handleChange = (e) => {
-    const { id, value } = e.target;
-    if (value.length <= 1) {
-      setInputValues({
-        ...inputValues,
-        [id]: value,
-      });
+    const { value } = e.target;
+    if (value.length <= 4) {
+      setOTP(value.trim().replace(/[^0-9]/g, ''));
     }
   };
 
@@ -101,8 +92,7 @@ const RegisterPage = () => {
   };
 
   const sendOtp = () => {
-    const otpValue = getCombinedValue();
-    if (!otpValue) {
+    if (!OTP) {
       toast.error(t('please_enter_otp_code'));
     } else {
       let phone = formData.phone;
@@ -112,7 +102,7 @@ const RegisterPage = () => {
       axios
         .post('https://backend.sakanijo.com/verify-phone', {
           phone: phone,
-          code: otpValue,
+          code: OTP,
         })
         .then((response) => {
           if (response.data.message) {
@@ -225,37 +215,23 @@ const RegisterPage = () => {
           <p className="message">{t('otp_sent_message')}</p>
           <div className="inputs">
             <input
-              id="input1"
-              type="text"
-              maxLength="1"
-              value={inputValues.input1}
+              name="otp"
+              type="number"
+              minLength="4"
+              maxLength="4"
+              value={OTP}
               onChange={handleChange}
-            />
-            <input
-              id="input2"
-              type="text"
-              maxLength="1"
-              value={inputValues.input2}
-              onChange={handleChange}
-            />
-            <input
-              id="input3"
-              type="text"
-              maxLength="1"
-              value={inputValues.input3}
-              onChange={handleChange}
-            />
-            <input
-              id="input4"
-              type="text"
-              maxLength="1"
-              value={inputValues.input4}
-              onChange={handleChange}
+              className="text-xl"
             />
           </div>
-          <button className="action" onClick={sendOtp}>
+          <Button
+            type="button"
+            className="action mx-auto min-w-24"
+            onClick={sendOtp}
+            disabled={OTP.length < 4}
+          >
             {t('verify')}
-          </button>
+          </Button>
         </div>
       ) : null}
     </>
