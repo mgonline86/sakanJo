@@ -134,12 +134,12 @@ const RegisterPage = () => {
 
   return (
     <>
-      <div className="mt-4 flex grow items-center justify-around p-4 md:p-0">
+      <div className="flex items-center justify-around p-4 mt-4 grow md:p-0">
         <div className="mb-40">
-          <h1 className="mb-4 text-center text-4xl" style={{ marginTop: 52 }}>
+          <h1 className="mb-4 text-4xl text-center" style={{ marginTop: 52 }}>
             {t('create_account')}
           </h1>
-          <form className="mx-auto max-w-md" onSubmit={handleFormSubmit}>
+          <form className="max-w-md mx-auto" onSubmit={handleFormSubmit}>
             <input
               name="name"
               type="text"
@@ -150,13 +150,13 @@ const RegisterPage = () => {
               autoComplete="name"
             />
             <div className="flex items-center">
-              <span className="rounded-e-none rounded-s-md border bg-gray-100 p-2">
+              <span className="p-2 bg-gray-100 border rounded-e-none rounded-s-md">
                 +962
               </span>
               <input
                 name="phone"
                 type="tel"
-                placeholder="05xxxxxxxx"
+                placeholder="07xxxxxxxx"
                 className="rounded-s-none border-s-0"
                 value={formData.phone}
                 onChange={(e) => {
@@ -184,18 +184,18 @@ const RegisterPage = () => {
                 variant="outline"
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="rounded-s-none border-s-0 py-5"
+                className="py-5 rounded-s-none border-s-0"
               >
                 {showPassword ? <VisibilityOff /> : <Visibility />}
               </Button>
             </div>
-            <button className="primary my-2">{t('create_account')}</button>
+            <button className="my-2 primary">{t('create_account')}</button>
             {loading ? <Spinner /> : null}
           </form>
 
-          <div className="mb-4 flex w-full items-center gap-4">
+          <div className="flex items-center w-full gap-4 mb-4">
             <div className="h-0 w-1/2 border-[1px]"></div>
-            <p className="small -mt-1">{t('or')}</p>
+            <p className="-mt-1 small">{t('or')}</p>
             <div className="h-0 w-1/2 border-[1px]"></div>
           </div>
 
@@ -226,7 +226,7 @@ const RegisterPage = () => {
           </div>
           <Button
             type="button"
-            className="action mx-auto min-w-24"
+            className="mx-auto action min-w-24"
             onClick={sendOtp}
             disabled={OTP.length < 4}
           >
