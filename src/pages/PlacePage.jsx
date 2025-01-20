@@ -13,11 +13,14 @@ import { Box, Typography } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Button } from '@/components/ui/button';
 import { Phone, WhatsApp } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 
 const PlacePage = () => {
   const { id } = useParams();
   const [place, setPlace] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     if (!id) {
@@ -57,7 +60,7 @@ const PlacePage = () => {
     <>
       <Helmet>
         {/* Standard Meta Tags */}
-        <title>{place?.title}</title>
+        <title>{`${place?.title} - ${t("app_name")}`}</title>
         <meta name="description" content={place?.description} />
         {/* Open Graph Meta Tags for WhatsApp */}
         <meta property="og:title" content={place?.title} />
