@@ -90,7 +90,7 @@ const EditProfileDialog = () => {
           {t("editProfile")}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="w-[90vw] sm:max-w-[500px] rounded-md">
         {/* <div className="flex justify-center">
           <div className="relative h-40 w-40 cursor-pointer overflow-hidden rounded-full bg-gray-200">
             <div

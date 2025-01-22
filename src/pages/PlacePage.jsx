@@ -248,7 +248,7 @@ export default function PlacePageNew() {
                     </Button>
                   )}
 
-                  <ShareButton shareLink={`/place/${place?.id}`} />
+                  <ShareButton shareLink={window.location.href} />
                 </div>
               )}
             </div>
