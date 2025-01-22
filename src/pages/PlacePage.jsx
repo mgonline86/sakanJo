@@ -1,4 +1,6 @@
 import ImagesGallery from '@/components/ImagesGallery';
+import ReviewStars from '@/components/ReviewStars';
+import ReviewsCardsSection from '@/components/ReviewsCardsSection';
 import ShareButton from '@/components/ShareModal';
 import SimilarProducts from '@/components/SimmilarPosts';
 import AddressLink from '@/components/ui/AddressLink';
@@ -22,6 +24,7 @@ import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
+import NotFoundPage from './NotFoundPage';
 
 export default function PlacePageNew() {
   const { id } = useParams();
@@ -56,7 +59,6 @@ export default function PlacePageNew() {
           `https://backend.sakanijo.com/reviews/${id}?page=1`,
         );
         setReviews(response.data);
-        console.log(response.data);
       } catch (error) {
         console.error('Error fetching reviews:', error);
       }
@@ -67,6 +69,10 @@ export default function PlacePageNew() {
 
   if (loading) {
     return <Spinner />;
+  }
+
+  if (!place) {
+    return <NotFoundPage />;
   }
 
   const photos = place.photos?.split(',');
@@ -112,6 +118,10 @@ export default function PlacePageNew() {
           <h1 className="text-3xl" style={{ fontWeight: '700' }}>
             {place?.title}
           </h1>
+
+          <div className="my-2">
+            <ReviewStars reviews={reviews} />
+          </div>
 
           <AddressLink
             placeAddress={place?.address}
@@ -200,7 +210,7 @@ export default function PlacePageNew() {
                 <div className="text-xs">
                   {formatDistance(new Date(place?.date), new Date(), {
                     addSuffix: true,
-                    locale: currentLanguage === "ar" ? arSA : enUS,
+                    locale: currentLanguage === 'ar' ? arSA : enUS,
                   })}
                 </div>
               </div>
@@ -280,6 +290,7 @@ export default function PlacePageNew() {
           placeId={place?.id}
         />
       </div>
+      {reviews?.reviews && <ReviewsCardsSection reviews={reviews.reviews} />}
     </div>
   );
 }

@@ -46,6 +46,7 @@ function App() {
             <Route path="/about" element={<AboutPage />} />
             <Route path="/contact" element={<ContactPage />} />
           </Route>
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
         <ToastContainer autoClose={2000} transition={Slide} />
       </PlaceProvider>
