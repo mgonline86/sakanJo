@@ -2,10 +2,7 @@
 module.exports = {
   important: true,
   darkMode: ['class'],
-  content: [
-  './src/**/*.{js,jsx,ts,tsx}',
-  './**/*.{js,jsx,ts,tsx}',
-],
+  content: ['./src/**/*.{js,jsx,ts,tsx}', './**/*.{js,jsx,ts,tsx}'],
   theme: {
     container: {
       center: true,
@@ -71,5 +68,19 @@ module.exports = {
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [
+    require('tailwindcss-animate'),
+    ({ addUtilities }) => {
+      const utilities = {
+        '.direction-rtl': {
+          direction: 'rtl',
+        },
+        '.direction-ltr': {
+          direction: 'ltr',
+        },
+      };
+
+      addUtilities(utilities);
+    },
+  ],
 };

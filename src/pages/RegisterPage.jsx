@@ -149,7 +149,7 @@ const RegisterPage = () => {
               required
               autoComplete="name"
             />
-            <div className="flex items-center">
+            <div className="flex items-center rtl:direction-ltr">
               <span className="p-2 bg-gray-100 border rounded-e-none rounded-s-md">
                 +962
               </span>

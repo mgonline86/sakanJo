@@ -143,14 +143,14 @@ const LoginPage = () => {
             {t('login_button')}
           </h1>
           <form className="mx-auto max-w-md" onSubmit={handleFormSubmit}>
-            <div className="flex items-center">
+            <div className="flex items-center rtl:direction-ltr">
               <span className="rounded-e-none rounded-s-md border bg-gray-100 p-2">
                 +962
               </span>
               <input
                 name="phone"
                 type="tel"
-                placeholder={t('phone_placeholder')}
+                placeholder="07xxxxxxxx"
                 className="rounded-s-none border-s-0"
                 value={formData.phone}
                 onChange={(e) => {
