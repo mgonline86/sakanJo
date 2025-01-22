@@ -33,9 +33,9 @@
     "Price per night" : "Price per night"  ,
     "Max no. of guests" : "Max no. of guests" ,
     "Save" : "Save" , 
-    "Buy": "Buy" , 
-    "Rent" : "Rent" ,
-    "Booking" : "Booking" ,
+    "buy": "Buy" , 
+    "rent" : "Rent" ,
+    "booking" : "Booking" ,
     "Land" : "Land" ,
     "farm" : "Farm" ,
     "Home" : "Home"   ,
@@ -148,6 +148,17 @@
   "reactions": "Reactions",
   "posted_by": "Posted by",
   "related_ads": "Related Ads",
+  "reviews": "Reviews",
+  "review": "Review",
 
-  "sponsored": "Sponsored"
+  "sponsored": "Sponsored",
+
+  "about_p1": "Welcome to Sakani Jo, your trusted platform for finding and listing properties. Whether you are looking to buy, rent, or book a property, or showcase land, farms, or apartments, Sakani connects you with a wide audience, simplifying your property journey.",
+  "about_p2": "At Sakani Jo, we believe in making property transactions more accessible and efficient. Our platform offers intuitive tools to advertise and search for properties, tailored to meet your unique needs.",
+  "about_p3": "Start your journey with us today and experience the convenience of Sakani Jo.",
+
+  "contact_p1": "Have any questions or need assistance? We are here to help! Feel free to reach out to us through the form below or use the provided contact details.",
+  "email": "Email",
+  "message": "Message",
+  "send": "Send"
 }

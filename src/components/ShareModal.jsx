@@ -37,7 +37,7 @@ const ShareModal = ({ shareLink }) => {
 
 
             {isVisible && (
-                <div className={`popup ${isVisible ? 'show' : ''}`} >
+                <div className={`z-20 max-w-[90vw] popup ${isVisible ? 'show' : ''}`} >
                     <header>
                         <span>نافذة المشاركة</span>
                         <div className="close" onClick={toggleModal}><Close style={{ color: 'black' }} /></div>
@@ -46,7 +46,7 @@ const ShareModal = ({ shareLink }) => {
                         <p>شارك الرابط عبر</p>
                         <ul className="icons">
                             {platforms.map((platform, index) => (
-                                <li key={index} style={{ backgroundColor: platform.color, padding: '10px', borderRadius: '50%' }}>
+                                <li key={index} style={{ backgroundColor: platform.color, borderRadius: '50%' }}>
                                     <a href={platform.link} target="_blank" rel="noopener noreferrer" style={{ color: 'white' }}>
                                         {platform.icon}
                                     </a>
