@@ -5,6 +5,7 @@ import AddressLink from '@/components/ui/AddressLink';
 import BookingWidget from '@/components/ui/BookingWidget';
 import PerksWidget from '@/components/ui/PerksWidget';
 import Spinner from '@/components/ui/Spinner';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
   AccountCircle,
@@ -16,6 +17,7 @@ import {
 } from '@mui/icons-material';
 import axios from 'axios';
 import { formatDistance } from 'date-fns';
+import { arSA, enUS } from 'date-fns/locale';
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useTranslation } from 'react-i18next';
@@ -25,7 +27,8 @@ export default function PlacePageNew() {
   const { id } = useParams();
   const [place, setPlace] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentLanguage = i18n.language;
 
   const [reviews, setReviews] = useState([]);
 
@@ -179,20 +182,25 @@ export default function PlacePageNew() {
 
           <div className="my-4 flex flex-wrap justify-between gap-2">
             <div className="flex items-center gap-2">
-              {place?.owner_image_name ? (
-                <img
-                  src={place?.owner_image_name}
-                  alt="owner"
-                  className="h-12 w-12 rounded-full object-cover"
-                />
-              ) : (
-                <AccountCircle className="h-12 w-12" />
-              )}
+              <div className="h-12 w-12">
+                <Avatar>
+                  {place?.owner_image_name ? (
+                    <AvatarImage src={place.owner_image_name} />
+                  ) : (
+                    <AccountCircle className="h-12 w-12" />
+                  )}
+
+                  <AvatarFallback className="text-3xl uppercase">
+                    {place?.ownerName.slice([0], [1])}
+                  </AvatarFallback>
+                </Avatar>
+              </div>
               <div className="text-sm md:text-base">
                 {t('posted_by')} <span>{place?.ownerName}</span>
                 <div className="text-xs">
                   {formatDistance(new Date(place?.date), new Date(), {
                     addSuffix: true,
+                    locale: currentLanguage === "ar" ? arSA : enUS,
                   })}
                 </div>
               </div>
