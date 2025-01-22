@@ -1,66 +1,83 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import axios from 'axios';
-import Spinner from '@/components/ui/Spinner';
+import ImagesGallery from '@/components/ImagesGallery';
+import ShareButton from '@/components/ShareModal';
+import SimilarProducts from '@/components/SimmilarPosts';
 import AddressLink from '@/components/ui/AddressLink';
 import BookingWidget from '@/components/ui/BookingWidget';
-import PlaceGallery from '@/components/ui/PlaceGallery';
 import PerksWidget from '@/components/ui/PerksWidget';
-import { Helmet } from 'react-helmet';
-import ShareButton from "@/components/ShareModal"
-import SimilarProducts from "@/components/SimmilarPosts"
-import { Box, Typography } from '@mui/material';
-import VisibilityIcon from '@mui/icons-material/Visibility';
+import Spinner from '@/components/ui/Spinner';
 import { Button } from '@/components/ui/button';
-import { Phone, WhatsApp } from '@mui/icons-material';
+import {
+  AccountCircle,
+  Favorite,
+  Phone,
+  ThumbUp,
+  Visibility,
+  WhatsApp,
+} from '@mui/icons-material';
+import axios from 'axios';
+import { formatDistance } from 'date-fns';
+import { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet';
 import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
 
-const PlacePage = () => {
+export default function PlacePageNew() {
   const { id } = useParams();
   const [place, setPlace] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
-  const { t, i18n } = useTranslation();
+  const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
-    if (!id) {
-      return '';
-    }
-
-    setLoading(true);
-
-    const getPlaceById = async (id) => {
+    async function fetchPlace() {
       try {
         const response = await axios.get(
           `https://backend.sakanijo.com/api/places/${id}`,
         );
         setPlace(response.data);
         setLoading(false);
-        return response.data;
       } catch (error) {
         console.error('Error fetching place:', error);
-        throw error;
+        setLoading(false);
       }
-    };
-    getPlaceById(id);
+    }
+
+    fetchPlace();
+  }, [id]);
+
+  useEffect(() => {
+    async function fetchReviews() {
+      try {
+        const response = await axios.get(
+          `https://backend.sakanijo.com/reviews/${id}?page=1`,
+        );
+        setReviews(response.data);
+        console.log(response.data);
+      } catch (error) {
+        console.error('Error fetching reviews:', error);
+      }
+    }
+
+    fetchReviews();
   }, [id]);
 
   if (loading) {
     return <Spinner />;
   }
 
-  if (!place) {
-    return;
-  }
-  console.log("place:",place);
-
   const photos = place.photos?.split(',');
 
+  const { bathroom, kitchen, rooms, stages } = JSON.parse(
+    JSON.parse(place.number_of_rooms),
+  );
+
+  const amenities = JSON.parse(JSON.parse(place.amenities));
+
   return (
-    <>
+    <div className="container mt-20 px-5 md:mt-28">
       <Helmet>
-        {/* Standard Meta Tags */}
-        <title>{`${place?.title} - ${t("app_name")}`}</title>
+        <title>{`${place?.title} - ${t('app_name')}`}</title>
         <meta name="description" content={place?.description} />
         {/* Open Graph Meta Tags for WhatsApp */}
         <meta property="og:title" content={place?.title} />
@@ -68,112 +85,193 @@ const PlacePage = () => {
         <meta
           property="og:image"
           content={`https://backend.sakanijo.com/api/images/${place?.folderName}/${photos[0]}`}
-        />{' '}
+        />
         {/* Replace with the URL of the image you want to display */}
         <meta
           property="og:url"
           content={`https://sakanijo.com/place/${place?.id}`}
-        />{' '}
+        />
         {/* Replace with the full URL of this specific page */}
         {/* Optional Meta Tags */}
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Sakani Jo" />
       </Helmet>
+      <div className="relative mb-14 flex flex-col justify-center gap-10 md:flex-row">
+        <div className="top-0 h-72 w-full rounded-xl border md:sticky md:h-96 md:w-1/2 md:flex-1">
+          <ImagesGallery
+            images={photos.map(
+              (photo) =>
+                `https://backend.sakanijo.com/api/images/${place.folderName}/${photo}`,
+            )}
+          />
+        </div>
+        <div className="md:flex-1">
+          <h1 className="text-3xl" style={{ fontWeight: '700' }}>
+            {place?.title}
+          </h1>
 
-      <div className="mt-4 overflow-x-hidden px-8 pt-20">
-        <h1 className="text-3xl" style={{ fontWeight:"700" }}>{place?.title}</h1>
-        <p style={{color:"gray" , fontWeight:"600" }}> رقم الإعلان : {place?.id}</p>
-        <AddressLink placeAddress={place?.address} />
-        <Box display="flex" alignItems="center" gap={1} padding={3}>
-        <VisibilityIcon style={{ color: '#333' }} />
-        <Typography variant="body1">{place?.viewers}</Typography>
-      </Box>
+          <AddressLink
+            placeAddress={place?.address}
+            longitude={place?.lng}
+            latitude={place?.lat}
+          />
 
-        
-        <PlaceGallery place={place} />
+          <div className="flex flex-wrap gap-2 text-[0.6rem] text-muted-foreground md:text-sm">
+            {bathroom > 0 && (
+              <span>
+                {bathroom} {t('bathroom')}
+              </span>
+            )}
+            {bathroom > 0 && kitchen > 0 && <span>.</span>}
+            {kitchen > 0 && (
+              <span>
+                {kitchen} {t('kitchen')}
+              </span>
+            )}
+            {kitchen > 0 && rooms > 0 && <span>.</span>}
+            {rooms > 0 && (
+              <span>
+                {rooms} {t('rooms')}
+              </span>
+            )}
+            {rooms > 0 && stages > 0 && <span>.</span>}
+            {stages > 0 && (
+              <span>
+                {stages} {t('stages')}
+              </span>
+            )}
+          </div>
 
-        <div className="mb-8 mt-8 grid grid-cols-1 gap-8 md:grid-cols-[2fr_1fr]">
-          <div className="">
+          {place?.space_general && (
+            <div className="my-2">
+              {place?.space_general} m<sup>2</sup>
+            </div>
+          )}
+
+          <div className="my-2 flex flex-wrap items-center gap-3 text-xs">
+            {place?.heartSave > 0 || place?.liked > 0
+              ? `${t('reactions')} |`
+              : ''}
+            {place?.heartSave > 0 && (
+              <span className="flex items-center gap-0.5">
+                <Favorite className="h-3.5 w-3.5" />
+                {place?.heartSave}
+              </span>
+            )}
+            {place?.liked > 0 && (
+              <span className="flex items-center gap-0.5">
+                <ThumbUp className="h-3.5 w-3.5" />
+                {place?.liked}
+              </span>
+            )}
+            {place?.viewers > 0 && (
+              <span className="flex items-center gap-0.5">
+                <Visibility className="h-3.5 w-3.5" />
+                {place?.viewers}
+              </span>
+            )}
+            <span className="flex-grow text-end text-lg font-semibold md:text-3xl">
+              {place?.price} JOD
+            </span>
+          </div>
+
+          <hr />
+
+          <div className="my-4 flex flex-wrap justify-between gap-2">
+            <div className="flex items-center gap-2">
+              {place?.owner_image_name ? (
+                <img
+                  src={place?.owner_image_name}
+                  alt="owner"
+                  className="h-12 w-12 rounded-full object-cover"
+                />
+              ) : (
+                <AccountCircle className="h-12 w-12" />
+              )}
+              <div className="text-sm md:text-base">
+                {t('posted_by')} <span>{place?.ownerName}</span>
+                <div className="text-xs">
+                  {formatDistance(new Date(place?.date), new Date(), {
+                    addSuffix: true,
+                  })}
+                </div>
+              </div>
+            </div>
+            <div className="flex-grow md:flex-grow-0">
+              {place.sellingMethod === 'booking' ? (
+                <BookingWidget place={place} />
+              ) : (
+                <div className="flex flex-wrap justify-center gap-2 md:justify-start">
+                  {place?.ownerPhone && (
+                    <Button
+                      variant="outline"
+                      asChild
+                      className="h-10 w-10 rounded-full text-primary hover:bg-primary hover:text-primary-foreground"
+                    >
+                      <a href={`tel:${place?.ownerPhone}`}>
+                        <Phone />
+                      </a>
+                    </Button>
+                  )}
+
+                  {place?.ownerPhone && place?.gettingCalls === 'whatsapp' && (
+                    <Button
+                      variant="outline"
+                      asChild
+                      className="h-10 w-10 rounded-full text-[#25D366] hover:bg-[#25D366] hover:text-white"
+                    >
+                      <a
+                        href={`https://wa.me/${place.ownerPhone}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <WhatsApp />
+                      </a>
+                    </Button>
+                  )}
+
+                  <ShareButton shareLink={`/place/${place?.id}`} />
+                </div>
+              )}
+            </div>
+          </div>
+
+          <hr />
+
+          <div className="my-4 flex flex-wrap gap-2">
+            {amenities?.map((amenity) => (
+              <div
+                key={amenity}
+                className="rounded-sm bg-gray-100 px-2 py-1 text-xs md:rounded-lg md:px-4 md:py-2 md:text-sm"
+              >
+                {amenity}
+              </div>
+            ))}
+          </div>
+
+          <hr />
+
+          <div className="my-2">
             <div className="my-4">
-              <h2 className="text-2xl font-semibold">Description</h2>
+              <h2 className="text-2xl font-semibold">{t('description_t')}</h2>
               {place.description}
             </div>
-            
+
             {place.sellingMethod === 'booking' && (
               <p>Max number of guests: {place.maxGuests}</p>
             )}
-            <PerksWidget perks={place?.perks} place={place} />
 
-          </div>
-          <div>
-            {place.sellingMethod === 'booking' ? (
-              <BookingWidget place={place} />
-            ) : (
-              <div className='flex justify-center gap-2 flex-wrap md:justify-start'>
-                {
-                  place?.ownerPhone &&
-                  <Button variant="outline" asChild className="rounded-full h-10 w-10 text-primary hover:bg-primary hover:text-primary-foreground">
-                    <a href={`tel:${place?.ownerPhone}`}>
-                      <Phone />
-                    </a>
-                  </Button>
-                }
-
-                {
-                  (place?.ownerPhone  && place?.gettingCalls === "whatsapp") && 
-                  <Button variant="outline" asChild className="rounded-full h-10 w-10 text-[#25D366] hover:bg-[#25D366] hover:text-white">
-                    <a href={`https://wa.me/${place.ownerPhone}`}  target='_blank' rel="noopener noreferrer" >
-                      <WhatsApp />
-                    </a>
-                  </Button>
-                }
-
-                <ShareButton shareLink={`/place/${place?.id}`} />
-              </div>
-
-            )}
-            
-          </div>
-        </div>
-        <div className="-mx-8 border-t bg-white px-8 py-8">
-          <div>
-            <h2 className="mt-4 text-2xl font-semibold">الاعلانات المشابهة</h2>
-          </div>
-          <div className="mb-4 mt-2 leading-5 text-gray-700">
-            {/* {(place?.type === 'home' || place?.type === 'apartment') && (
-              <>
-                <p style={{ fontWeight: 'semibold', color: '#121212' }}>
-                  Rooms Number: {place?.roomsNumber}
-                </p>
-                <p style={{ fontWeight: 'semibold', color: '#121212' }}>
-                  Stages Number: {place?.stagesNumber}
-                </p>
-                <p style={{ fontWeight: 'semibold', color: '#121212' }}>
-                  Kitchen Number: {place?.numberKitchen}
-                </p>
-              </>
-            )}
-
-            {(place?.type === 'farm' || place?.type === 'land') && (
-              <>
-                <p style={{ fontWeight: 'semibold', color: '#121212' }}>
-                  Property Area: {place?.area}m²
-                </p>
-                <p style={{ fontWeight: 'semibold', color: '#121212' }}>
-                  Streets Number: {place?.streets}
-                </p>
-              </>
-            )} */}
-
-
-            <SimilarProducts  homeType={place?.home_type} sellType={place?.buy_or_rent} placeId={place?.id}/>
-              
-
+            {place.perks && <PerksWidget perks={place?.perks} place={place} />}
           </div>
         </div>
       </div>
-    </>
+      <div className="my-14">
+        <SimilarProducts
+          homeType={place?.home_type}
+          sellType={place?.buy_or_rent}
+          placeId={place?.id}
+        />
+      </div>
+    </div>
   );
-};
-
-export default PlacePage;
+}
