@@ -86,7 +86,7 @@ export default function PlacePageNew() {
   return (
     <div className="container mt-20 px-5 md:mt-28">
       <Helmet>
-        <title>{`${place?.title} - ${t('app_name')}`}</title>
+        <title>{`${place?.title} | ${t('app_name')}`}</title>
         <meta name="description" content={place?.description} />
         {/* Open Graph Meta Tags for WhatsApp */}
         <meta property="og:title" content={place?.title} />
