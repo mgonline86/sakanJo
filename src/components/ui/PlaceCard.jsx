@@ -1,10 +1,10 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '../../../hooks';
+import { useTranslation } from 'react-i18next';
 
 const PlaceCard = ({ place }) => {
-  const { id, address, title, price } = place;
+  const { id, address, title, price, sponsored } = place;
   const photos = place.photos?.split(',');
+
+  const { t } = useTranslation();
 
   const sellingMethodTranslations = {
     rent: 'إيجار',
@@ -13,17 +13,20 @@ const PlaceCard = ({ place }) => {
   };
 
   return (
-    <a
-      href={`/place/${id}`}
-      className="m-4 flex flex-col md:m-2 xl:m-0"
-    >
+    <a href={`/place/${id}`} className="m-4 flex flex-col md:m-2 xl:m-0">
       <div className="card  relative">
         {photos?.[0] && (
           <div className="relative h-4/5 w-full rounded-xl">
             <img
               src={`https://backend.sakanijo.com/api/images/${encodeURIComponent(place.folderName)}/${encodeURIComponent(photos[0])}`}
               className="h-full w-full rounded-xl object-cover"
+              alt={place.title}
             />
+            {!!sponsored && (
+              <span className="absolute bottom-2 right-2 z-10 rounded-lg bg-green-500 px-2 py-1 text-xs font-bold text-white">
+                {t('sponsored')}
+              </span>
+            )}
             <div
               className="absolute left-2 top-2"
               style={{
@@ -35,7 +38,6 @@ const PlaceCard = ({ place }) => {
               }}
             >
               <p style={{ color: 'white', fontSize: 16 }}>
-                {' '}
                 {sellingMethodTranslations[place.buy_or_rent] ||
                   place.buy_or_rent}
               </p>
