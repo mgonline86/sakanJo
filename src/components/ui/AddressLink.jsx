@@ -1,6 +1,9 @@
-import React from 'react';
-
-const AddressLink = ({ placeAddress, className = null }) => {
+const AddressLink = ({
+  placeAddress,
+  longitude,
+  latitude,
+  className = null,
+}) => {
   if (!className) {
     className = 'my-3 block';
   }
@@ -9,7 +12,11 @@ const AddressLink = ({ placeAddress, className = null }) => {
   return (
     <a
       className={className}
-      href={`https://maps.google.com/?q=${placeAddress}`}
+      href={
+        longitude && latitude
+          ? `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`
+          : `https://maps.google.com/?q=${placeAddress}`
+      }
       target="blank"
     >
       <svg
@@ -20,6 +27,7 @@ const AddressLink = ({ placeAddress, className = null }) => {
         stroke="currentColor"
         className="h-6 w-6"
       >
+        <title>Location</title>
         <path
           strokeLinecap="round"
           strokeLinejoin="round"

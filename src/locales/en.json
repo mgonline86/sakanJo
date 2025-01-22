@@ -139,7 +139,14 @@
   "product_type_t": "Product Type",
 
   "please_fill_all_inputs": "Please fill all inputs",
-  "invalid_phone_number": "Invalid phone number"
+  "invalid_phone_number": "Invalid phone number",
 
+  "bathroom": "Bathroom",
+  "kitchen": "Kitchen",
+  "rooms": "Rooms",
+  "stages": "Stages",
+  "reactions": "Reactions",
+  "posted_by": "Posted by",
+  "related_ads": "Related Ads"
 
 }

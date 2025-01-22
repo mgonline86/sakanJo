@@ -181,7 +181,13 @@
       "submit": "حفظ المنتج",
       
       "please_fill_all_inputs": "الرجاء تعبئة جميع الحقول",
-      "invalid_phone_number": "رقم هاتف غير صحيح"
+      "invalid_phone_number": "رقم هاتف غير صحيح",
     
-    
+      "bathroom": "حمام",
+      "kitchen": "مطبخ",
+      "rooms": "غرف",
+      "stages": "طوابق",
+      "reactions": "الاعجابات",
+      "posted_by": "اعلن من طرف",
+      "related_ads": "الاعلانات المشابهة"
 }
