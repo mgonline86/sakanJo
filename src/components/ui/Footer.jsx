@@ -1,5 +1,6 @@
 import { Facebook, Instagram, LinkedIn, Twitter } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import './footer.css';
 
 const Footer = () => {
@@ -96,14 +97,20 @@ const Footer = () => {
           <div className="flex flex-col gap-1">
             <strong className="font-medium">SakaniJo</strong>
             <p>
-              <span className="cursor-pointer font-medium text-gray-700 decoration-1 underline-offset-1 hover:underline">
+              <Link
+                to="/about"
+                className="cursor-pointer font-medium text-gray-700 decoration-1 underline-offset-1 hover:underline"
+              >
                 {t('about_us_link')}
-              </span>
+              </Link>
             </p>
             <p>
-              <span className="cursor-pointer font-medium text-gray-700 decoration-1 underline-offset-1 hover:underline">
+              <Link
+                to="/contact"
+                className="cursor-pointer font-medium text-gray-700 decoration-1 underline-offset-1 hover:underline"
+              >
                 {t('contact_us')}
-              </span>
+              </Link>
             </p>
           </div>
         </div>
