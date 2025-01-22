@@ -23,4 +23,8 @@ i18n
     }
   });
 
+// Set initial html lang attribute and direction
+document.querySelector('html').setAttribute('lang', i18n.language);
+document.querySelector('html').setAttribute('dir', i18n.language === 'ar' ? 'rtl' : 'ltr');
+
 export default i18n;

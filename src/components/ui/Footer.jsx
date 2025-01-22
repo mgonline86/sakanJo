@@ -6,7 +6,13 @@ const Footer = () => {
   const { t, i18n } = useTranslation();
 
   const changeLanguage = (lng) => {
+    // Save the selected language in localStorage
     localStorage.setItem('i18nextLng', lng);
+    
+    // Change html lang attribute and direction
+    document.querySelector('html').setAttribute('lang', lng);
+    document.querySelector('html').setAttribute('dir', lng === 'ar' ? 'rtl' : 'ltr');
+
     i18n.changeLanguage(lng);
   };
   const isArabic = i18n.language == "ar"
