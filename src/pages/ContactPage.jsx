@@ -1,23 +1,27 @@
 import { Button } from '@/components/ui/button';
+import { Helmet } from 'react-helmet';
+import { useTranslation } from 'react-i18next';
 
 export default function ContactPage() {
+  const { t } = useTranslation();
   return (
     <main className="container mt-20 px-5 md:mt-28">
+      <Helmet>
+        <title>{`${t('contact_us')} | ${t('app_name')}`}</title>
+      </Helmet>
       <div className="rounded-lg bg-white p-6 shadow">
-        <h2 className="mb-4 text-2xl font-bold text-gray-800">Contact Us</h2>
-        <p className="mb-4 text-gray-700">
-          Have any questions or need assistance? We are here to help! Feel free
-          to reach out to us through the form below or use the provided contact
-          details.
-        </p>
+        <h2 className="mb-4 text-2xl font-bold text-gray-800">
+          {t('contact_us')}
+        </h2>
+        <p className="mb-4 text-gray-700">{t('contact_p1')}</p>
         <form className="space-y-4">
-          <div className='flex flex-wrap gap-4'>
+          <div className="flex flex-wrap gap-4">
             <div className="flex-grow md:flex-1">
               <label
                 htmlFor="name"
                 className="block text-sm font-medium text-gray-700"
               >
-                Name
+                {t('name')}
               </label>
               <input
                 type="text"
@@ -32,7 +36,7 @@ export default function ContactPage() {
                 htmlFor="email"
                 className="block text-sm font-medium text-gray-700"
               >
-                Email
+                {t('email')}
               </label>
               <input
                 type="email"
@@ -48,7 +52,7 @@ export default function ContactPage() {
               htmlFor="message"
               className="block text-sm font-medium text-gray-700"
             >
-              Message
+              {t('message')}
             </label>
             <textarea
               id="message"
@@ -59,7 +63,7 @@ export default function ContactPage() {
             />
           </div>
           <Button type="submit" className="rounded-full">
-            Send Message
+            {t('send')}
           </Button>
         </form>
       </div>

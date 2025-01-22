@@ -1,28 +1,22 @@
+import { Helmet } from 'react-helmet';
 import { useTranslation } from 'react-i18next';
 
 export default function AboutPage() {
   const { t } = useTranslation();
   return (
     <main className="container mt-20 px-5 md:mt-28">
+      <Helmet>
+        <title>{`${t('about_us')} | ${t('app_name')}`}</title>
+      </Helmet>
       <div className="rounded-lg bg-white p-6 shadow">
-        <h2 className="mb-4 text-2xl font-bold text-gray-800">About Us</h2>
-        <p className="mb-4 text-gray-700">
-          Welcome to <strong>Sakani</strong>, your trusted platform for finding
-          and listing properties. Whether you are looking to buy, rent, or book
-          a property, or showcase land, farms, or apartments, Sakani connects
-          you with a wide audience, simplifying your property journey.
-        </p>
-        <p className="mb-4 text-gray-700">
-          At Sakani, we believe in making property transactions more accessible
-          and efficient. Our platform offers intuitive tools to advertise and
-          search for properties, tailored to meet your unique needs.
-        </p>
-        <p className="mb-6 text-gray-700">
-          Start your journey with us today and experience the convenience of
-          Sakani.
-        </p>
+        <h2 className="mb-4 text-2xl font-bold text-gray-800">
+          {t('about_us')}
+        </h2>
+        <p className="mb-4 text-gray-700">{t('about_p1')}</p>
+        <p className="mb-4 text-gray-700">{t('about_p2')}</p>
+        <p className="mb-6 text-gray-700">{t('about_p3')}</p>
         <div className="my-4 md:my-10 ">
-          <div className="text-lg font-medium mb-2">{t('enjoy_features')}</div>
+          <div className="mb-2 text-lg font-medium">{t('enjoy_features')}</div>
           <div className="flex flex-col gap-1 md:flex-row">
             <a href="#" className="playstore-button">
               <span className="icon">
