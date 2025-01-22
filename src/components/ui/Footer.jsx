@@ -6,6 +6,7 @@ const Footer = () => {
   const { t, i18n } = useTranslation();
 
   const changeLanguage = (lng) => {
+    localStorage.setItem('i18nextLng', lng);
     i18n.changeLanguage(lng);
   };
   const isArabic = i18n.language == "ar"
