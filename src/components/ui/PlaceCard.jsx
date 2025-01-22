@@ -6,12 +6,6 @@ const PlaceCard = ({ place }) => {
 
   const { t } = useTranslation();
 
-  const sellingMethodTranslations = {
-    rent: 'إيجار',
-    buy: 'شراء',
-    booking: 'حجز',
-  };
-
   return (
     <a href={`/place/${id}`} className="m-4 flex flex-col md:m-2 xl:m-0">
       <div className="card relative rounded-md shadow transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg">
@@ -38,8 +32,7 @@ const PlaceCard = ({ place }) => {
               }}
             >
               <p style={{ color: 'white', fontSize: 16 }}>
-                {sellingMethodTranslations[place.buy_or_rent] ||
-                  place.buy_or_rent}
+                {t(place.buy_or_rent) || place.buy_or_rent}
               </p>
             </div>
           </div>
