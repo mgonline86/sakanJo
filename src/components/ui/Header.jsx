@@ -1,19 +1,17 @@
-import React, { useEffect } from 'react';
-import { useContext, useState } from 'react';
+import { Add } from '@mui/icons-material';
+import { Avatar, AvatarImage } from '@radix-ui/react-avatar';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../hooks';
-import SearchBar from './SearchBar';
-import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar';
 import logo from '../../../public/assets/logo.png';
+import SearchBar from './SearchBar';
 import { Button } from './button';
-import { Add } from '@mui/icons-material';
-import { useTranslation } from 'react-i18next';
 export const Header = () => {
   const auth = useAuth();
   const location = useLocation();
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
-  const [showSearchBar, setShowSearchBar] = useState(true);
   const [hasShadow, setHasShadow] = useState(false);
   const { user } = auth;
 
@@ -24,13 +22,6 @@ export const Header = () => {
 
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
-
-    // hide searchbar based on url
-    if (location.pathname === '/') {
-      setShowSearchBar(true);
-    } else {
-      setShowSearchBar(false);
-    }
     // clean up the event listener when the component is unmounted
     return () => {
       window.removeEventListener('scroll', handleScroll);
@@ -43,9 +34,7 @@ export const Header = () => {
         hasShadow ? 'shadow-md' : ''
       }`}
     >
-      <div
-        className="flex items-center justify-between w-screen max-w-screen-xl gap-2"
-      >
+      <div className="flex w-screen max-w-screen-xl items-center justify-between gap-2">
         <a href="/" className="flex items-center gap-1">
           <span className="text-2xl font-bold text-red-500 md:block">
             <img
@@ -57,22 +46,23 @@ export const Header = () => {
           </span>
         </a>
 
-        {showSearchBar && <SearchBar />}
+        <SearchBar />
 
-        <div className='flex items-center gap-2'>
+        <div className="flex items-center gap-2">
           {user && location.pathname !== '/account/places/new' && (
             <Button
               asChild
-              className="gap-2 px-2 rounded-full md:px-3 md:flex md:items-center"
+              className="gap-2 rounded-full px-2 md:flex md:items-center md:px-3"
             >
               <Link to="/account/places/new">
-                <Add /> <span className="hidden md:block">{t('Add new place')}</span>
+                <Add />{' '}
+                <span className="hidden md:block">{t('Add new place')}</span>
               </Link>
             </Button>
           )}
           <Link
             to={user ? '/account' : '/login'}
-            className="flex items-center gap-2 border-gray-300 rounded-full w-50 md:border md:px-2 md:py-1"
+            className="w-50 flex items-center gap-2 rounded-full border-gray-300 md:border md:px-2 md:py-1"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -80,7 +70,7 @@ export const Header = () => {
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="hidden w-6 h-6 md:block"
+              className="hidden h-6 w-6 md:block"
             >
               <path
                 strokeLinecap="round"
@@ -93,11 +83,11 @@ export const Header = () => {
               {user ? (
                 <Avatar>
                   {user?.picture ? (
-                    <AvatarImage src={user.picture} className="w-full h-full" />
+                    <AvatarImage src={user.picture} className="h-full w-full" />
                   ) : (
                     <AvatarImage
                       src="https://res.cloudinary.com/rahul4019/image/upload/v1695133265/pngwing.com_zi4cre.png"
-                      className="w-full h-full"
+                      className="h-full w-full"
                     />
                   )}
                 </Avatar>
@@ -112,7 +102,7 @@ export const Header = () => {
                   enableBackground="new 796 796 200 200"
                   xmlSpace="preserve"
                   stroke="#858080"
-                  className="w-8 h-8"
+                  className="h-8 w-8"
                 >
                   <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
                   <g
