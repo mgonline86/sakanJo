@@ -119,6 +119,8 @@ export default function PlacePageNew() {
             {place?.title}
           </h1>
 
+          <h4 className='mt-1'>{t('ad_number')}: {place?.id}</h4>
+
           <div className="my-2">
             <ReviewStars reviews={reviews} />
           </div>
