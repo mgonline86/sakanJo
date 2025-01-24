@@ -119,7 +119,9 @@ export default function PlacePageNew() {
             {place?.title}
           </h1>
 
-          <h4 className='mt-1'>{t('ad_number')}: {place?.id}</h4>
+          <h4 className="mt-1">
+            {t('ad_number')}: {place?.id}
+          </h4>
 
           <div className="my-2">
             <ReviewStars reviews={reviews} />
@@ -185,9 +187,12 @@ export default function PlacePageNew() {
                 {place?.viewers}
               </span>
             )}
-            <span className="flex-grow text-end text-lg font-semibold md:text-3xl">
-              {place?.price} JOD
-            </span>
+
+            {place?.price > 0 && (
+              <span className="flex-grow text-end text-lg font-semibold md:text-3xl">
+                {place?.price} JOD
+              </span>
+            )}
           </div>
 
           <hr />
