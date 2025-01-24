@@ -207,6 +207,7 @@ const PlacesFormPage = () => {
     const formDataIsValid = isValidPlaceData(); // Assuming you have this validation function
     if (!formDataIsValid) {
       console.error('Form data is invalid');
+      setSubmitting(false);
       return;
     }
 
