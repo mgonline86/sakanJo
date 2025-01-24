@@ -17,6 +17,9 @@ const Footer = () => {
       .setAttribute('dir', lng === 'ar' ? 'rtl' : 'ltr');
 
     i18n.changeLanguage(lng);
+
+    // Reload the page
+    window.location.reload();
   };
   const isArabic = i18n.language === 'ar';
 

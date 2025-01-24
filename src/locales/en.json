@@ -150,6 +150,7 @@
   "related_ads": "Related Ads",
   "reviews": "Reviews",
   "review": "Review",
+  "ad_number": "Ad Number",
 
   "sponsored": "Sponsored",
 
@@ -160,5 +161,93 @@
   "contact_p1": "Have any questions or need assistance? We are here to help! Feel free to reach out to us through the form below or use the provided contact details.",
   "email": "Email",
   "message": "Message",
-  "send": "Send"
+  "send": "Send",
+
+  "new_ad": {
+    "type": {
+        "header": "Type",
+        "description": "If you want to set deferent of types about your place , please download our app in app store or play store",
+        "placeholder": "Select a Type",
+        "options": {
+            "apartment": "Apartment",
+            "villa_house": "Villa / House",
+            "farm": "Farm",
+            "land": "Land",
+            "chalets": "Chalets",
+            "studio": "Studio",
+            "shops_warehouses": "Shops and Warehouses",
+            "offices_clinics": "Offices and Clinics",
+            "camps_cabins": "Camps and Cabins",
+            "swimming_pools": "Swimming Pools",
+            "playgrounds": "Playgrounds",
+            "gyms": "Gym",
+            "trip_organization": "Trip Organization",
+            "meeting_rooms": "Meeting Rooms"
+        },
+        "error":"Type can't be empty!"
+    },
+    "title": {
+        "header": "Title",
+        "description": "title for your place. Should be short and catchy as in advertisement",
+        "placeholder": "title, for example: My lovely apt",
+        "error":"Title can't be empty!"
+    },
+    "address": {
+        "header": "Address",
+        "description": "address to this place",
+        "placeholder": "address, for example: 123 Main St, City, Country",
+        "error":"Address can't be empty!"
+    },
+    "photos": {
+        "header": "Photos",
+        "description": "more = better",
+        "error":"Upload at least 5 photos!"
+    },
+    "description": {
+        "header": "Description",
+        "description": "description of the place",
+        "error":"Description can't be empty!"
+    },
+    "perks": {
+        "header": "Perks",
+        "description": "select all the perks of your place",
+        "placeholder": "Select Perks"
+    },
+    "extra_info": {
+        "header": "Extra Info",
+        "description": "house rules, etc"
+    },
+    "selling_method": {
+        "header": "Selling Method",
+        "description": "select here the method for selling",
+        "placeholder": "Select Selling Method",
+        "options": {
+            "purchase": "Purchase",
+            "rent": "Rent",
+            "booking": "Booking"
+        }
+    },
+    "price": {
+        "header": "Price",
+       "description": {
+            "booking" : "Specify the maximum number of guests so that the client stays within the limit."
+        }
+    },
+    "max_guests": {
+        "header": "Max no. of guests",
+        "error": {
+            "min": "At least one guests is required!",
+            "max": "Max. guests can't be greater than 10"
+        }
+    },
+    "price_per_night": {
+        "header": "Price per night"
+    },
+    "save": "Save",
+    "submit_error": "Couldn't save place"
+  },
+
+  "upload": "Upload",
+
+  "forgot_password": "Forgot Password"
 }

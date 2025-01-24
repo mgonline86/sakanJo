@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 
-import Image from './Image';
+import { useTranslation } from 'react-i18next';
 import axiosInstance from '../../utils/axios';
+import Image from './Image';
 
 const PhotosUploader = ({ addedPhotos, setAddedPhotos }) => {
+  const { t } = useTranslation();
   const [photoLink, setphotoLink] = useState('');
 
   const addPhotoByLink = async (e) => {
@@ -27,14 +29,13 @@ const PhotosUploader = ({ addedPhotos, setAddedPhotos }) => {
       // const { data: filenames } = await axiosInstance.post('/upload', data, {
       //   headers: { 'Content-type': 'multipart/form-data' },
       // });
-  
+
       // Update state to add newly uploaded photos
-      setAddedPhotos(prevPhotos => [...prevPhotos, ...files]);
+      setAddedPhotos((prevPhotos) => [...prevPhotos, ...files]);
     } catch (error) {
       console.error('Failed to upload photos:', error);
     }
   };
-  
 
   const removePhoto = (filename) => {
     setAddedPhotos([...addedPhotos.filter((photo) => photo !== filename)]);
@@ -49,10 +50,9 @@ const PhotosUploader = ({ addedPhotos, setAddedPhotos }) => {
     ]);
   };
 
-
   return (
     <>
-      <div className="mt-2 grid grid-cols-3 gap-2 md:grid-cols-4 lg:grid-cols-6 ">
+      <div className="mt-2 flex flex-wrap gap-2">
         {addedPhotos?.length > 0 &&
           addedPhotos.map((link) => (
             <div className="relative flex h-32" key={link.name}>
@@ -62,6 +62,7 @@ const PhotosUploader = ({ addedPhotos, setAddedPhotos }) => {
                 alt=""
               />
               <button
+                type="button"
                 onClick={() => removePhoto(link)}
                 className="absolute bottom-1 right-1 cursor-pointer rounded-full bg-black bg-opacity-50 p-1 text-white hover:bg-opacity-70"
               >
@@ -73,6 +74,7 @@ const PhotosUploader = ({ addedPhotos, setAddedPhotos }) => {
                   stroke="currentColor"
                   className="h-6 w-6"
                 >
+                  <title>Trash</title>
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -80,14 +82,13 @@ const PhotosUploader = ({ addedPhotos, setAddedPhotos }) => {
                   />
                 </svg>
               </button>
-              
             </div>
           ))}
-        <label className="flex h-32 cursor-pointer items-center justify-center gap-1 rounded-2xl border bg-transparent p-2 text-2xl text-gray-600">
+        <label className="flex h-32 w-32 cursor-pointer items-center justify-center gap-1 rounded-2xl border bg-transparent p-2 text-2xl text-gray-600">
           <input
             type="file"
             multiple
-            accept='image/*'
+            accept="image/*"
             className="hidden"
             onChange={uploadPhoto}
           />
@@ -99,13 +100,14 @@ const PhotosUploader = ({ addedPhotos, setAddedPhotos }) => {
             stroke="currentColor"
             className="h-8 w-8"
           >
+            <title>Upload</title>
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
               d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"
             />
           </svg>
-          Upload
+          {t('upload')}
         </label>
       </div>
     </>
