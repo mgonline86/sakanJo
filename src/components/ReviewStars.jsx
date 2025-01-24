@@ -6,10 +6,6 @@ export default function ReviewStars({ reviews }) {
 
   const reviewsValue = Number(reviews.average_rating);
 
-  if (!reviewsValue) {
-    return null;
-  }
-
   return (
     <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
       <div className="flex items-center gap-2">
