@@ -20,7 +20,7 @@ import {
 import axios from 'axios';
 import { formatDistance } from 'date-fns';
 import { arSA, enUS } from 'date-fns/locale';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -66,6 +66,21 @@ export default function PlacePageNew() {
 
     fetchReviews();
   }, [id]);
+
+  const ownerPictureLink = useMemo(() => {
+    if (!place) {
+      return null;
+    }
+
+    const {owner_picture, owner_image_name} = place;
+    
+    if(owner_picture === 100) {
+      return `https://backend.sakanijo.com/user/profile-picture/${owner_image_name}`;
+    }
+
+    return `/assets/publisherUsers/${owner_picture}.png`;
+    
+  }, [place]);
 
   if (loading) {
     return <Spinner />;
@@ -201,8 +216,8 @@ export default function PlacePageNew() {
             <div className="flex items-center gap-2">
               <div className="h-12 w-12">
                 <Avatar>
-                  {place?.owner_image_name ? (
-                    <AvatarImage src={place.owner_image_name} />
+                  {ownerPictureLink ? (
+                    <AvatarImage src={ownerPictureLink} />
                   ) : (
                     <AccountCircle className="h-12 w-12" />
                   )}
