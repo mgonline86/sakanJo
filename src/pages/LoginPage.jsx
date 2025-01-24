@@ -175,6 +175,13 @@ const LoginPage = () => {
             {loading ? <Spinner /> : null}
           </form>
 
+          <Link
+            className="py-2 text-gray-500 hover:underline"
+            to={'/forgot-password'}
+          >
+            {t('forgot_password')}
+          </Link>
+
           <div className="mb-4 flex w-full items-center gap-4">
             <div className="h-0 w-1/2 border-[1px]"></div>
             <p className="small -mt-1">{t('or')}</p>

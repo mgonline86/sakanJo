@@ -247,5 +247,7 @@
     "submit_error": "Couldn't save place"
   },
 
-  "upload": "Upload"
+  "upload": "Upload",
+
+  "forgot_password": "Forgot Password"
 }

@@ -1,26 +1,24 @@
-import { useEffect } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import { Slide, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import Layout from './components/ui/Layout';
-import IndexPage from './pages/IndexPage';
-import RegisterPage from './pages/RegisterPage';
-import LoginPage from './pages/LoginPage';
-import ProfilePage from './pages/ProfilePage';
-import PlacesPage from './pages/PlacesPage';
-import BookingsPage from './pages/BookingsPage';
-import PlacesFormPage from './pages/PlacesFormPage';
-import PlacePage from './pages/PlacePage';
-import SingleBookedPlace from './pages/SingleBookedPlace';
-import axiosInstance from './utils/axios';
-import { UserProvider } from './providers/UserProvider';
-import { PlaceProvider } from './providers/PlaceProvider';
-import { getItemFromLocalStorage } from './utils';
-import NotFoundPage from './pages/NotFoundPage';
-import PrivacyPolicy from './pages/Policy';
 import AboutPage from './pages/AboutPage';
+import BookingsPage from './pages/BookingsPage';
 import ContactPage from './pages/ContactPage';
+import ForgotPassword from './pages/ForgotPassword';
+import IndexPage from './pages/IndexPage';
+import LoginPage from './pages/LoginPage';
+import NotFoundPage from './pages/NotFoundPage';
+import PlacePage from './pages/PlacePage';
+import PlacesFormPage from './pages/PlacesFormPage';
+import PlacesPage from './pages/PlacesPage';
+import PrivacyPolicy from './pages/Policy';
+import ProfilePage from './pages/ProfilePage';
+import RegisterPage from './pages/RegisterPage';
+import SingleBookedPlace from './pages/SingleBookedPlace';
+import { PlaceProvider } from './providers/PlaceProvider';
+import { UserProvider } from './providers/UserProvider';
 
 function App() {
   return (
@@ -33,6 +31,7 @@ function App() {
             <Route index element={<IndexPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/account" element={<ProfilePage />} />
             <Route path="/account/places" element={<PlacesPage />} />
             <Route path="/account/places/new" element={<PlacesFormPage />} />
