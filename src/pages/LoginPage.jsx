@@ -27,10 +27,6 @@ const LoginPage = () => {
     }
   };
 
-  const getCombinedValue = () => {
-    return Object.values(inputValues).join('');
-  };
-
   useEffect(() => {}, []);
 
   const sendOtp = () => {

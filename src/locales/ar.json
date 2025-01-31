@@ -68,6 +68,7 @@
   "login": "سجل دخولك",
   "registration_successful": "تم التسجيل بنجاح",
   "please_enter_otp_code": "يرجى إدخال رمز التحقق",
+  "please_enter_correct_otp_code": "يرجىإدخال رمز التحقق صحيح",
   "verification_code": "رمز التحقق",
   "otp_sent_message": "لقد أرسلنا رمز التحقق إلى رقم هاتفك المحمول",
   "verify": "تحقق",
@@ -299,6 +300,10 @@
       
       "unauthorized_error": "الوصول غير مصرح له!",
 
-      "back": "رجوع"
+      "back": "رجوع",
+
+      "something_went_wrong": "حدث خطأ ما، يرجى المحاولة مرة أخرى",
+
+      "new_password": "كلمة المرور الجديدة"
       
 }

@@ -87,10 +87,6 @@ const RegisterPage = () => {
     }
   };
 
-  const getCombinedValue = () => {
-    return Object.values(inputValues).join('');
-  };
-
   const sendOtp = () => {
     if (!OTP) {
       toast.error(t('please_enter_otp_code'));
@@ -208,7 +204,7 @@ const RegisterPage = () => {
         </div>
       </div>
 
-      {isVerification ? (
+      {OTP ? (
         <div className="form">
           <div className="title">{t('otp')}</div>
           <div className="title">{t('verification_code')}</div>

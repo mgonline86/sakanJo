@@ -75,6 +75,7 @@
     "login": "Login",
     "registration_successful": "Registration successful",
     "please_enter_otp_code": "Please enter the OTP code",
+    "please_enter_correct_otp_code": "Please enter the correct OTP code",
     "verification_code": "Verification Code",
     "otp_sent_message": "We have sent a verification code to your mobile number",
     "verify": "Verify",
@@ -257,5 +258,9 @@
 
   "unauthorized_error": "403 | Unauthorized Access!",
 
-  "back": "Back"
+  "back": "Back",
+  
+  "something_went_wrong": "Something went wrong, please try again!",
+
+  "new_password": "New Password"
 }
