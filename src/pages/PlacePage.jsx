@@ -294,19 +294,22 @@ export default function PlacePageNew() {
             </div>
           </div>
 
-          <hr />
-
-          <div className="my-4 flex flex-wrap gap-2">
-            {amenities?.map((amenity) => (
-              <div
-                key={amenity}
-                className="rounded-sm bg-gray-100 px-2 py-1 text-xs md:rounded-lg md:px-4 md:py-2 md:text-sm"
-              >
-                {amenity}
+          {amenities.length > 0 && (
+            <>
+              <hr />
+              <div className="my-4 flex flex-wrap gap-2">
+                {amenities?.map((amenity) => (
+                  <div
+                    key={amenity}
+                    className="rounded-sm bg-gray-100 px-2 py-1 text-xs md:rounded-lg md:px-4 md:py-2 md:text-sm"
+                  >
+                    {amenity}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-
+            </>
+          )}
+          
           <hr />
 
           <div className="my-2">
@@ -315,7 +318,7 @@ export default function PlacePageNew() {
               {place.description}
             </div>
 
-            {place.sellingMethod === 'booking' && (
+            {place.buyOrRent === 'الحجز' && (
               <p>Max number of guests: {place.maxGuests}</p>
             )}
 
