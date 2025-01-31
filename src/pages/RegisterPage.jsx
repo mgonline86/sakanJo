@@ -87,10 +87,6 @@ const RegisterPage = () => {
     }
   };
 
-  const getCombinedValue = () => {
-    return Object.values(inputValues).join('');
-  };
-
   const sendOtp = () => {
     if (!OTP) {
       toast.error(t('please_enter_otp_code'));
@@ -108,6 +104,10 @@ const RegisterPage = () => {
           if (response.data.message) {
             toast.success(t(response.data.message));
             if (userData.user && userData.user.session_token) {
+
+              // remove password from user object
+              userData.user.password = undefined;
+              
               localStorage.setItem('user', JSON.stringify(userData.user));
               localStorage.setItem('token', userData.user.session_token);
               setRedirect(true);
@@ -208,7 +208,7 @@ const RegisterPage = () => {
         </div>
       </div>
 
-      {isVerification ? (
+      {OTP ? (
         <div className="form">
           <div className="title">{t('otp')}</div>
           <div className="title">{t('verification_code')}</div>
