@@ -93,6 +93,10 @@ export const useProvideAuth = () => {
       console.log(data);
 
       if (data?.user && data.sessionToken) {
+        
+        // remove password from user object
+        data.user.password = undefined;
+
         setUser(data.user);
         localStorage.setItem('user', JSON.stringify(data.user));
         localStorage.setItem('token', data.sessionToken);

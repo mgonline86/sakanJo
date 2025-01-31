@@ -72,14 +72,13 @@ export default function PlacePageNew() {
       return null;
     }
 
-    const {owner_picture, owner_image_name} = place;
-    
-    if(owner_picture === 100) {
+    const { owner_picture, owner_image_name } = place;
+
+    if (owner_picture === 100) {
       return `https://backend.sakanijo.com/user/profile-picture/${owner_image_name}`;
     }
 
     return `/assets/publisherUsers/${owner_picture}.png`;
-    
   }, [place]);
 
   if (loading) {
@@ -121,7 +120,26 @@ export default function PlacePageNew() {
         <meta property="og:site_name" content="Sakani Jo" />
       </Helmet>
       <div className="relative mb-14 flex flex-col justify-center gap-10 md:flex-row">
-        <div className="top-0 h-72 w-full rounded-xl border md:sticky md:h-96 md:w-1/2 md:flex-1">
+        <div className="relative top-0 h-72 w-full rounded-xl border md:sticky md:h-96 md:w-1/2 md:flex-1">
+          {!!place.sponsored && (
+            <span className="absolute bottom-2 right-2 z-10 rounded-lg bg-green-500 px-2 py-1 text-xs font-bold text-white">
+              {t('sponsored')}
+            </span>
+          )}
+          <div
+            className="absolute left-2 top-2 z-10"
+            style={{
+              padding: '5px',
+              paddingLeft: '15px',
+              paddingRight: '15px',
+              backgroundColor: '#467c9d',
+              borderRadius: '10px',
+            }}
+          >
+            <p style={{ color: 'white', fontSize: 16 }}>
+              {t(place.buy_or_rent) || place.buy_or_rent}
+            </p>
+          </div>
           <ImagesGallery
             images={photos.map(
               (photo) =>
@@ -203,7 +221,7 @@ export default function PlacePageNew() {
               </span>
             )}
 
-            {place?.price > 0 && (
+            {place?.price > 0 && !place?.priceHide && (
               <span className="flex-grow text-end text-lg font-semibold md:text-3xl">
                 {place?.price} JOD
               </span>
