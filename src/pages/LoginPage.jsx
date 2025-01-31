@@ -46,6 +46,10 @@ const LoginPage = () => {
           if (response.data.message) {
             toast.success(response.data.message);
             if (response.data.user && response.data.user.session_token) {
+              
+              // remove password from user object
+              response.data.user.password = undefined;
+              
               localStorage.setItem('user', JSON.stringify(response.data.user));
               localStorage.setItem('token', response.data.user.session_token);
               setRedirect(true);

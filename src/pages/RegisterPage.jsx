@@ -104,6 +104,10 @@ const RegisterPage = () => {
           if (response.data.message) {
             toast.success(t(response.data.message));
             if (userData.user && userData.user.session_token) {
+
+              // remove password from user object
+              userData.user.password = undefined;
+              
               localStorage.setItem('user', JSON.stringify(userData.user));
               localStorage.setItem('token', userData.user.session_token);
               setRedirect(true);
