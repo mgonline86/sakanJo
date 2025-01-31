@@ -44,7 +44,7 @@ export const Header = () => {
 
   return (
     <header
-      className={`fixed top-0 z-10 flex w-screen justify-center bg-white px-4 py-4 ${
+      className={`fixed top-0 z-50 flex w-screen justify-center bg-white px-4 py-4 ${
         hasShadow ? 'shadow-md' : ''
       }`}
     >
