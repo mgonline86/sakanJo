@@ -169,25 +169,25 @@
         "description": "If you want to set deferent of types about your place , please download our app in app store or play store",
         "placeholder": "Select a Type",
         "options": {
-            "apartment": "Apartment",
-            "villa_house": "Villa / House",
-            "farm": "Farm",
-            "land": "Land",
-            "chalets": "Chalets",
-            "studio": "Studio",
-            "shops_warehouses": "Shops and Warehouses",
-            "offices_clinics": "Offices and Clinics",
-            "camps_cabins": "Camps and Cabins",
-            "swimming_pools": "Swimming Pools",
-            "playgrounds": "Playgrounds",
-            "gyms": "Gym",
-            "trip_organization": "Trip Organization",
-            "meeting_rooms": "Meeting Rooms"
+            "شقة": "Apartment",
+            "فيلا / منزل": "Villa / House",
+            "مزرعة": "Farm",
+            "أرض": "Land",
+            "شليهات": "Chalets",
+            "استوديو": "Studio",
+            "محلات ومخازن": "Shops and Warehouses",
+            "مكاتب وعيادات": "Offices and Clinics",
+            "مخيمات و اكواخ": "Camps and Cabins",
+            "مسابح": "Swimming Pools",
+            "ملاعب": "Playgrounds",
+            "صالات رياضة": "Gym",
+            "تنظيم رحلات": "Trip Organization",
+            "قاعات اجتماعات": "Meeting Rooms"
         },
         "error":"Type can't be empty!"
     },
     "title": {
-        "header": "Title",
+        "header": "Ad Title",
         "description": "title for your place. Should be short and catchy as in advertisement",
         "placeholder": "title, for example: My lovely apt",
         "error":"Title can't be empty!"
@@ -198,7 +198,7 @@
         "placeholder": "address, for example: 123 Main St, City, Country",
         "error":"Address can't be empty!"
     },
-    "photos": {
+    "images": {
         "header": "Photos",
         "description": "more = better",
         "error":"Upload at least 5 photos!"
@@ -208,27 +208,28 @@
         "description": "description of the place",
         "error":"Description can't be empty!"
     },
-    "perks": {
-        "header": "Perks",
-        "description": "select all the perks of your place",
-        "placeholder": "Select Perks"
+    "amenities": {
+        "header": "Amenities",
+        "description": "select all the amenities of your place",
+        "placeholder": "Select Amenities"
     },
     "extra_info": {
         "header": "Extra Info",
         "description": "house rules, etc"
     },
-    "selling_method": {
+    "buyOrRent": {
         "header": "Selling Method",
         "description": "select here the method for selling",
         "placeholder": "Select Selling Method",
         "options": {
-            "purchase": "Purchase",
-            "rent": "Rent",
-            "booking": "Booking"
-        }
+            "للبيع": "Purchase",
+            "للإيجار": "Rent",
+            "الحجز": "Booking"
+        },
+        "error":"Selling Method can't be empty!"
     },
     "price": {
-        "header": "Price",
+        "header": "Price (JOD)",
        "description": {
             "booking" : "Specify the maximum number of guests so that the client stays within the limit."
         }
@@ -244,10 +245,17 @@
         "header": "Price per night"
     },
     "save": "Save",
-    "submit_error": "Couldn't save place"
+    "submit_success": "Submitted successfully!",
+    "submit_error": "Something went wrong, please try again!"
   },
 
   "upload": "Upload",
 
-  "forgot_password": "Forgot Password"
+  "limit_reached": "Limit reached!",
+
+  "forgot_password": "Forgot Password",
+
+  "unauthorized_error": "403 | Unauthorized Access!",
+
+  "back": "Back"
 }
