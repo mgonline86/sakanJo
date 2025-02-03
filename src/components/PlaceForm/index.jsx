@@ -21,10 +21,12 @@ import {
   adsAcceptOptions,
   genders,
   gettingCallsOptions,
+  hajezHours,
   homeTypeOptions,
   meetingRoomTypes,
   poolsDepth,
   publisherStateOptions,
+  rentTypeOptions,
   sellingTypeOptions,
   subscriptionTypes,
   tripPeriodOptions,
@@ -37,7 +39,7 @@ import { cn } from '@/lib/utils';
 import { CalendarMonth, CloudUpload, DeleteForever } from '@mui/icons-material';
 import { format } from 'date-fns';
 import { serialize } from 'object-to-formdata';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
@@ -52,6 +54,46 @@ import HajezSpecificDays from './HajezSpecificDays';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+const addNewPlace = async (formData) => {
+  console.log('calling addNewPlace', formData);
+  return await axios.post(
+    'https://backend.sakanijo.com/api/places/add',
+    formData,
+    {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    },
+  );
+};
+
+const updatePlace = async (id, formData) => {
+  console.log('calling updatePlace', formData);
+  return await axios.post(
+    `https://backend.sakanijo.com/ads/update/${id}`,
+    formData,
+    {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    },
+  );
+};
+
+const updateAllowedKeys = [
+  'title',
+  'description',
+  'price',
+  'priceBeforeNoon',
+  'priceAfterNoon',
+  'amenities',
+  'variablePrices',
+  'specificDaysInCalander',
+  'folderName',
+  'tripDate',
+  'poolType',
+  'subscriptionTypeGym',
+  'existingPhotos',
+  'images',
+  'calanderDaysPrice',
+];
+
 const dayHoursHomeTypes = ['مسابح', 'قاعات اجتماعات', 'صالات رياضة', 'ملاعب'];
 
 export default function PlaceForm({ id }) {
@@ -63,13 +105,32 @@ export default function PlaceForm({ id }) {
 
   const navigate = useNavigate();
 
-  const [currentHomeType, currentCity, images, buyOrRent, price] = form.watch([
+  const [
+    currentHomeType,
+    currentCity,
+    currentNeighborhood,
+    images,
+    buyOrRent,
+    price,
+  ] = form.watch([
     'homeType',
     'address[0]',
+    'address[1]',
     'images',
     'buyOrRent',
     'price',
   ]);
+
+  useEffect(() => {
+    if (id && typeof currentNeighborhood === 'string') {
+      const [name, lat, long] = currentNeighborhood.split('|');
+      form.setValue('address.1', {
+        name,
+        lat: Number(lat),
+        long: Number(long),
+      });
+    }
+  }, [id, currentNeighborhood, form]);
 
   /* handle home type change */
   const currentAmenities = useMemo(() => {
@@ -81,8 +142,13 @@ export default function PlaceForm({ id }) {
     return jordanCities[currentCity]?.places || [];
   }, [currentCity]);
 
+  const initialHajezPriceVaries =
+    JSON.stringify(form.getValues('variablePrices')).length > 2;
   // handle hajez price varies
-  const [hajezPriceVaries, setHajezPriceVaries] = useState(false);
+  const [hajezPriceVaries, setHajezPriceVaries] = useState(
+    initialHajezPriceVaries,
+  );
+
   const handleHajezPriceVaries = () => {
     setHajezPriceVaries((prev) => {
       if (!prev) {
@@ -104,14 +170,14 @@ export default function PlaceForm({ id }) {
     const {
       address: {
         0: city,
-        1: { name: address, lat, long: lng },
+        1: { name: address, lat: latitude, long: longitude },
       },
     } = values;
     const payload = {
       ...values,
       address,
-      lat,
-      lng,
+      latitude,
+      longitude,
       ownerId: user.id,
       ownerName: user.name,
       ownerPhone: user.phone,
@@ -124,7 +190,7 @@ export default function PlaceForm({ id }) {
     }
 
     // variablePrices,hajezDays,amenities,numberOfRooms
-
+    // Yassin said it has to be JSON string ??!
     if (payload.variablePrices) {
       payload.variablePrices = JSON.stringify(payload.variablePrices);
     }
@@ -137,6 +203,66 @@ export default function PlaceForm({ id }) {
     if (payload.numberOfRooms) {
       payload.numberOfRooms = JSON.stringify(payload.numberOfRooms);
     }
+    if (payload.specificDaysInCalander) {
+      payload.specificDaysInCalander = JSON.stringify(
+        payload.specificDaysInCalander,
+      );
+    }
+
+    if (payload.priceBeforeNoon === '') {
+      payload.priceBeforeNoon = payload.price;
+    }
+
+    if (payload.priceAfterNoon === '') {
+      payload.priceAfterNoon = payload.price;
+    }
+
+    if (payload.timeOpen) {
+      payload.timeOpen = JSON.stringify(payload.timeOpen);
+    }
+
+    if (payload.calanderDaysPrice) {
+      payload.calanderDaysPrice = JSON.stringify(payload.calanderDaysPrice);
+    }
+
+    // for update somehow I need to change keys for Yassin to recieve it in backend :(
+    if (id) {
+      for (const key in payload) {
+        if (!updateAllowedKeys.includes(key)) {
+          payload[key] = undefined;
+        }
+      }
+      if (
+        payload.existingPhotos &&
+        JSON.stringify(payload.existingPhotos).length > 2
+      ) {
+        payload.existingPhotos = JSON.stringify(payload.existingPhotos);
+      } else {
+        payload.existingPhotos = undefined;
+      }
+      if (payload.images) {
+        payload.newPhotos = payload.images;
+        payload.images = undefined;
+      }
+      if (payload.subscriptionTypeGym) {
+        payload.subsGym = payload.subscriptionTypeGym;
+        payload.subscriptionTypeGym = undefined;
+      }
+      if (payload.variablePrices) {
+        payload.variable_prices = payload.variablePrices;
+        payload.variablePrices = undefined;
+      }
+      if (payload.calanderDaysPrice) {
+        payload.selected_day_price = payload.calanderDaysPrice;
+        payload.calanderDaysPrice = undefined;
+      }
+      if (payload.specificDaysInCalander) {
+        payload.speceficDayInCalander = payload.specificDaysInCalander;
+        payload.specificDaysInCalander = undefined;
+      }
+    }
+
+    console.log('payload', payload);
 
     const serializeOptions = {
       noFilesWithArrayNotation: true,
@@ -145,20 +271,16 @@ export default function PlaceForm({ id }) {
     const formData = serialize(payload, serializeOptions);
 
     try {
-      const res = await axios.post(
-        'https://backend.sakanijo.com/api/places/add',
-        formData,
-        {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        },
-      );
+      const res = id
+        ? await updatePlace(id, formData)
+        : await addNewPlace(formData);
 
-      const { id } = res.data;
-
-      toast.success(t('new_ad.submit_success'));
-
-      // navigate(`/account/places/${id}`);
-      navigate('/account/places');
+      if (res.status < 400) {
+        toast.success(t('new_ad.submit_success'));
+        navigate('/account/places');
+      } else {
+        toast.error(t('new_ad.submit_error'));
+      }
     } catch (error) {
       console.error('Failed to add place:', error);
       toast.error(t('new_ad.submit_error'));
@@ -212,38 +334,42 @@ export default function PlaceForm({ id }) {
         noValidate
       >
         {/* REAL ESTATE TYPE */}
-        <FormField
-          control={form.control}
-          name="homeType"
-          render={({ field }) => (
-            <FormItem className="md:col-span-2">
-              <FormLabel>{t('new_ad.type.header')}</FormLabel>
-              <FormControl>
-                <RadioGroup
-                  onValueChange={(value) => handleUpdateHomeType(field, value)}
-                  defaultValue={field.value}
-                  className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5"
-                  dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}
-                >
-                  {homeTypeOptions.map((option) => (
-                    <FormItem
-                      key={option}
-                      className="flex items-center gap-x-1 space-y-0 rounded-md border px-4 py-2"
-                    >
-                      <FormControl>
-                        <RadioGroupItem value={option} />
-                      </FormControl>
-                      <FormLabel className="font-normal">
-                        {t(`new_ad.type.options.${option}`)}
-                      </FormLabel>
-                    </FormItem>
-                  ))}
-                </RadioGroup>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {!id && (
+          <FormField
+            control={form.control}
+            name="homeType"
+            render={({ field }) => (
+              <FormItem className="md:col-span-2">
+                <FormLabel>{t('new_ad.type.header')}</FormLabel>
+                <FormControl>
+                  <RadioGroup
+                    onValueChange={(value) =>
+                      handleUpdateHomeType(field, value)
+                    }
+                    defaultValue={field.value}
+                    className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5"
+                    dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}
+                  >
+                    {homeTypeOptions.map((option) => (
+                      <FormItem
+                        key={option}
+                        className="flex items-center gap-x-1 space-y-0 rounded-md border px-4 py-2"
+                      >
+                        <FormControl>
+                          <RadioGroupItem value={option} />
+                        </FormControl>
+                        <FormLabel className="font-normal">
+                          {t(`new_ad.type.options.${option}`)}
+                        </FormLabel>
+                      </FormItem>
+                    ))}
+                  </RadioGroup>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         {/* TITLE */}
         <FormField
@@ -317,254 +443,288 @@ export default function PlaceForm({ id }) {
         )}
 
         {/* BUY OR RENT */}
-        <FormField
-          control={form.control}
-          name="buyOrRent"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>{t('new_ad.type.header')}</FormLabel>
-              <FormControl>
-                <RadioGroup
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  className="flex flex-wrap gap-4"
-                  dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}
-                >
-                  {sellingTypeOptions.map((option) => (
-                    <FormItem
-                      key={option}
-                      className="flex items-center gap-x-1 space-y-0 rounded-md border px-4 py-2"
-                    >
-                      <FormControl>
-                        <RadioGroupItem value={option} />
-                      </FormControl>
-                      <FormLabel className="font-normal">
-                        {t(`new_ad.buyOrRent.options.${option}`)}
-                      </FormLabel>
-                    </FormItem>
-                  ))}
-                </RadioGroup>
-              </FormControl>
-              <FormDescription>
-                {t('new_ad.buyOrRent.description')}
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        {/* ADS ACCEPT */}
-        <FormField
-          control={form.control}
-          name="adsAccept"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>قابل للتقسيط و التفاوض</FormLabel>
-              <FormControl>
-                <RadioGroup
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  className="flex flex-wrap gap-4"
-                  dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}
-                >
-                  {adsAcceptOptions.map((option) => (
-                    <FormItem
-                      key={option}
-                      className="flex items-center gap-x-1 space-y-0 rounded-md border px-4 py-2"
-                    >
-                      <FormControl>
-                        <RadioGroupItem value={option} />
-                      </FormControl>
-                      <FormLabel className="font-normal">{option}</FormLabel>
-                    </FormItem>
-                  ))}
-                </RadioGroup>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        {/* GETTING CALLS */}
-        <FormField
-          control={form.control}
-          name="gettingCalls"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>أريد إستقبال الإستفسارات عبر</FormLabel>
-              <FormControl>
-                <RadioGroup
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  className="flex flex-wrap gap-4"
-                  dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}
-                >
-                  {gettingCallsOptions.map((option) => (
-                    <FormItem
-                      key={option}
-                      className="flex items-center gap-x-1 space-y-0 rounded-md border px-4 py-2"
-                    >
-                      <FormControl>
-                        <RadioGroupItem value={option} />
-                      </FormControl>
-                      <FormLabel className="font-normal">{option}</FormLabel>
-                    </FormItem>
-                  ))}
-                </RadioGroup>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        {/* PUBLISHER STATE */}
-        <FormField
-          control={form.control}
-          name="publisherState"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>هل أنت؟</FormLabel>
-              <FormControl>
-                <RadioGroup
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  className="flex flex-wrap gap-4"
-                  dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}
-                >
-                  {publisherStateOptions.map((option) => (
-                    <FormItem
-                      key={option}
-                      className="flex items-center gap-x-1 space-y-0 rounded-md border px-4 py-2"
-                    >
-                      <FormControl>
-                        <RadioGroupItem value={option} />
-                      </FormControl>
-                      <FormLabel className="font-normal">{option}</FormLabel>
-                    </FormItem>
-                  ))}
-                </RadioGroup>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        {/* ADDRESS - CITY */}
-        <FormField
-          control={form.control}
-          name="address[0]"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>المدينة</FormLabel>
-              <Select
-                onValueChange={(value) => handleCityChange(field, value)}
-                defaultValue={field.value}
-              >
+        {!id && (
+          <FormField
+            control={form.control}
+            name="buyOrRent"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('new_ad.type.header')}</FormLabel>
                 <FormControl>
-                  <SelectTrigger className="my-2 capitalize rtl:direction-rtl">
-                    <SelectValue placeholder="إختار المدينة" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent className="rtl:direction-rtl">
-                  {Object.keys(jordanCities).map((city) => (
-                    <SelectItem key={city} value={city} className="capitalize">
-                      {city}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormDescription>إختار المدينة المناسبة</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        {/* ADDRESS - NEIGHBORHOOD */}
-        <FormField
-          control={form.control}
-          name="address[1]"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>المنطقة</FormLabel>
-              <Select
-                onValueChange={(value) => {
-                  field.onChange(
-                    currentNeighborhoods.find(
-                      (neighborhood) =>
-                        `${neighborhood.name}-${neighborhood.long}-${neighborhood.lat}` ===
-                        value,
-                    ),
-                  );
-                }}
-                defaultValue={field.value}
-              >
-                <FormControl>
-                  <SelectTrigger
-                    className="my-2 capitalize rtl:direction-rtl"
-                    disabled={!currentCity}
+                  <RadioGroup
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    className="flex flex-wrap gap-4"
+                    dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}
                   >
-                    <SelectValue placeholder="إختار المنطقة" />
-                  </SelectTrigger>
+                    {sellingTypeOptions.map((option) => (
+                      <FormItem
+                        key={option}
+                        className="flex items-center gap-x-1 space-y-0 rounded-md border px-4 py-2"
+                      >
+                        <FormControl>
+                          <RadioGroupItem value={option} />
+                        </FormControl>
+                        <FormLabel className="font-normal">
+                          {t(`new_ad.buyOrRent.options.${option}`)}
+                        </FormLabel>
+                      </FormItem>
+                    ))}
+                  </RadioGroup>
                 </FormControl>
-                <SelectContent className="rtl:direction-rtl">
-                  {currentNeighborhoods.map((neighborhood) => (
-                    <SelectItem
-                      key={`${neighborhood.name}-${neighborhood.long}-${neighborhood.lat}`}
-                      value={`${neighborhood.name}-${neighborhood.long}-${neighborhood.lat}`}
-                      className="capitalize"
+                <FormDescription>
+                  {t('new_ad.buyOrRent.description')}
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+
+        {/* ADS ACCEPT */}
+        {!id && (
+          <FormField
+            control={form.control}
+            name="adsAccept"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>قابل للتقسيط و التفاوض</FormLabel>
+                <FormControl>
+                  <RadioGroup
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    className="flex flex-wrap gap-4"
+                    dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}
+                  >
+                    {adsAcceptOptions.map((option) => (
+                      <FormItem
+                        key={option}
+                        className="flex items-center gap-x-1 space-y-0 rounded-md border px-4 py-2"
+                      >
+                        <FormControl>
+                          <RadioGroupItem value={option} />
+                        </FormControl>
+                        <FormLabel className="font-normal">{option}</FormLabel>
+                      </FormItem>
+                    ))}
+                  </RadioGroup>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+
+        {/* GETTING CALLS */}
+        {!id && (
+          <FormField
+            control={form.control}
+            name="gettingCalls"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>أريد إستقبال الإستفسارات عبر</FormLabel>
+                <FormControl>
+                  <RadioGroup
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    className="flex flex-wrap gap-4"
+                    dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}
+                  >
+                    {gettingCallsOptions.map((option) => (
+                      <FormItem
+                        key={option}
+                        className="flex items-center gap-x-1 space-y-0 rounded-md border px-4 py-2"
+                      >
+                        <FormControl>
+                          <RadioGroupItem value={option} />
+                        </FormControl>
+                        <FormLabel className="font-normal">{option}</FormLabel>
+                      </FormItem>
+                    ))}
+                  </RadioGroup>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+
+        {/* PUBLISHER STATE */}
+        {!id && (
+          <FormField
+            control={form.control}
+            name="publisherState"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>هل أنت؟</FormLabel>
+                <FormControl>
+                  <RadioGroup
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    className="flex flex-wrap gap-4"
+                    dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}
+                  >
+                    {publisherStateOptions.map((option) => (
+                      <FormItem
+                        key={option}
+                        className="flex items-center gap-x-1 space-y-0 rounded-md border px-4 py-2"
+                      >
+                        <FormControl>
+                          <RadioGroupItem value={option} />
+                        </FormControl>
+                        <FormLabel className="font-normal">{option}</FormLabel>
+                      </FormItem>
+                    ))}
+                  </RadioGroup>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+
+        {/* ADDRESS - CITY */}
+        {!id && (
+          <FormField
+            control={form.control}
+            name="address[0]"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>المدينة</FormLabel>
+                <Select
+                  onValueChange={(value) => handleCityChange(field, value)}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger className="my-2 capitalize rtl:direction-rtl">
+                      <SelectValue placeholder="إختار المدينة" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent className="rtl:direction-rtl">
+                    {Object.keys(jordanCities).map((city) => (
+                      <SelectItem
+                        key={city}
+                        value={city}
+                        className="capitalize"
+                      >
+                        {city}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormDescription>إختار المدينة المناسبة</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+
+        {/* ADDRESS - NEIGHBORHOOD */}
+        {!id && (
+          <FormField
+            control={form.control}
+            name="address[1]"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>المنطقة</FormLabel>
+                <Select
+                  onValueChange={(value) => {
+                    field.onChange(
+                      currentNeighborhoods.find(
+                        (neighborhood) =>
+                          `${neighborhood.name}|${neighborhood.long}|${neighborhood.lat}` ===
+                          value,
+                      ),
+                    );
+                  }}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger
+                      className="my-2 capitalize rtl:direction-rtl"
+                      disabled={!currentCity}
                     >
-                      {neighborhood.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormDescription>إختار المنطقة المناسبة</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                      <SelectValue placeholder="إختار المنطقة" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent className="rtl:direction-rtl">
+                    {currentNeighborhoods.map((neighborhood) => (
+                      <SelectItem
+                        key={`${neighborhood.name}|${neighborhood.long}|${neighborhood.lat}`}
+                        value={`${neighborhood.name}|${neighborhood.long}|${neighborhood.lat}`}
+                        className="capitalize"
+                      >
+                        {neighborhood.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormDescription>إختار المنطقة المناسبة</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+
         {/* STREET */}
-        <FormField
-          control={form.control}
-          name="street"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>الشارع</FormLabel>
-              <FormControl>
-                <Input placeholder="ادخل الشارع" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {!id && (
+          <FormField
+            control={form.control}
+            name="street"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>الشارع</FormLabel>
+                <FormControl>
+                  <Input placeholder="ادخل الشارع" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+
         {/* CLOSE PLACE */}
-        <FormField
-          control={form.control}
-          name="closePlace"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>علامة مميزة أو مكان قريب</FormLabel>
-              <FormControl>
-                <Input placeholder="ادخل علامة مميزة او مكان قريب" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {!id && (
+          <FormField
+            control={form.control}
+            name="closePlace"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>علامة مميزة أو مكان قريب</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="ادخل علامة مميزة او مكان قريب"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+
         {/* SPACE GENERAL */}
-        <FormField
-          control={form.control}
-          name="spaceGeneral"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>مساحة (متر مربع)</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  type="number"
-                  min={1}
-                  onChange={(e) => field.onChange(Number(e.target.value))}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {!id && (
+          <FormField
+            control={form.control}
+            name="spaceGeneral"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>مساحة (متر مربع)</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="number"
+                    min={1}
+                    onChange={(e) => field.onChange(Number(e.target.value))}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+
         {/* IMAGES */}
         <div className="mt-2 flex flex-wrap gap-2 md:col-span-2">
           <FormField
@@ -654,50 +814,60 @@ export default function PlaceForm({ id }) {
         />
 
         {/* PRICE HIDE */}
-        <FormField
-          control={form.control}
-          name="priceHide"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-              <div className="space-y-0.5">
-                <FormLabel>إخفاء السعر</FormLabel>
-                <FormDescription>
-                  سيتم اخفاء السعر في صفحة الاعلان
-                </FormDescription>
-              </div>
-              <FormControl>
-                <Switch
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
+        {!id && (
+          <FormField
+            control={form.control}
+            name="priceHide"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                <div className="space-y-0.5">
+                  <FormLabel>إخفاء السعر</FormLabel>
+                  <FormDescription>
+                    سيتم اخفاء السعر في صفحة الاعلان
+                  </FormDescription>
+                </div>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+        )}
 
         {/* IF RENT */}
         {/* RENT TYPE */}
-        {buyOrRent === 'للإيجار' && (
+        {buyOrRent === 'للإيجار' && !id && (
           <FormField
             control={form.control}
             name="rentType"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>نوع الايجار</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger className="my-2 rtl:direction-rtl">
-                      <SelectValue placeholder="إختر نوع الايجار" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent className="rtl:direction-rtl">
-                    <SelectItem value="شهري">شهري</SelectItem>
-                    <SelectItem value="سنوي">سنوي</SelectItem>
-                  </SelectContent>
-                </Select>
+                <FormControl>
+                  <RadioGroup
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    className="flex flex-wrap gap-3"
+                    dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}
+                  >
+                    {rentTypeOptions.map((rentType) => (
+                      <FormItem
+                        key={rentType}
+                        className="flex items-center gap-x-1 space-y-0"
+                      >
+                        <FormControl>
+                          <RadioGroupItem value={rentType} />
+                        </FormControl>
+                        <FormLabel className="font-normal">
+                          {rentType}
+                        </FormLabel>
+                      </FormItem>
+                    ))}
+                  </RadioGroup>
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -708,75 +878,81 @@ export default function PlaceForm({ id }) {
         {buyOrRent === 'الحجز' && (
           <>
             {/* HAJEZ DAYS */}
-            <FormField
-              control={form.control}
-              name="hajezDays"
-              render={({ field }) => (
-                <FormItem className="md:col-span-2">
-                  <FormLabel>ايام الحجز</FormLabel>
-                  <FormControl>
-                    <Input {...field} type="hidden" />
-                  </FormControl>
-                  <div className="flex flex-wrap gap-4 rounded-lg border p-4">
-                    {weekDays.map((day) => (
-                      <div key={day} className="flex items-center gap-1">
-                        <Checkbox
-                          className="rounded"
-                          value={day}
-                          checked={field.value.includes(day)}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              field.onChange([...field.value, day]);
-                            } else {
-                              field.onChange(
-                                field.value.filter((value) => value !== day),
-                              );
-                            }
-                          }}
-                        />
-                        <FormLabel>{day}</FormLabel>
-                      </div>
-                    ))}
-                  </div>
-                  <FormDescription>
-                    يجب تحديد يوم واحد على الاقل للحجز
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {!id && (
+              <FormField
+                control={form.control}
+                name="hajezDays"
+                render={({ field }) => (
+                  <FormItem className="md:col-span-2">
+                    <FormLabel>ايام الحجز</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="hidden" />
+                    </FormControl>
+                    <div className="flex flex-wrap gap-4 rounded-lg border p-4">
+                      {weekDays.map((day) => (
+                        <div key={day} className="flex items-center gap-1">
+                          <Checkbox
+                            className="rounded"
+                            value={day}
+                            checked={field.value.includes(day)}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                field.onChange([...field.value, day]);
+                              } else {
+                                field.onChange(
+                                  field.value.filter((value) => value !== day),
+                                );
+                              }
+                            }}
+                          />
+                          <FormLabel>{day}</FormLabel>
+                        </div>
+                      ))}
+                    </div>
+                    <FormDescription>
+                      يجب تحديد يوم واحد على الاقل للحجز
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
             {/* HAJEZ TYPE */}
-            <FormField
-              control={form.control}
-              name="hajezType"
-              render={({ field }) => (
-                <FormItem className="space-y-3">
-                  <FormLabel>نوع الحجز</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      className="flex flex-wrap gap-3"
-                      dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}
-                    >
-                      <FormItem className="flex items-center gap-x-1 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="24ساعة" />
-                        </FormControl>
-                        <FormLabel className="font-normal">24ساعة</FormLabel>
-                      </FormItem>
-                      <FormItem className="flex items-center gap-x-1 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="12ساعة" />
-                        </FormControl>
-                        <FormLabel className="font-normal">12ساعة</FormLabel>
-                      </FormItem>
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {!id && (
+              <FormField
+                control={form.control}
+                name="hajezType"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel>نوع الحجز</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="flex flex-wrap gap-3"
+                        dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}
+                      >
+                        {hajezHours.map((hajezType) => (
+                          <FormItem
+                            key={hajezType}
+                            className="flex items-center gap-x-1 space-y-0"
+                          >
+                            <FormControl>
+                              <RadioGroupItem value={hajezType} />
+                            </FormControl>
+                            <FormLabel className="font-normal">
+                              {hajezType}
+                            </FormLabel>
+                          </FormItem>
+                        ))}
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
             {/* HAJEZ VARIATION */}
             <div className="flex flex-col gap-4 rounded-lg border p-3 md:col-span-2">
@@ -826,7 +1002,9 @@ export default function PlaceForm({ id }) {
           </>
         )}
 
-        {dayHoursHomeTypes.includes(currentHomeType) && <DayHoursInputs />}
+        {dayHoursHomeTypes.includes(currentHomeType) && (
+          <DayHoursInputs id={id} />
+        )}
 
         {/* POOL & GYM */}
         {['مسابح', 'صالات رياضة'].includes(currentHomeType) && (
@@ -864,7 +1042,7 @@ export default function PlaceForm({ id }) {
         )}
 
         {/* POOL */}
-        {currentHomeType === 'مسابح' && (
+        {currentHomeType === 'مسابح' && !id && (
           <div className="flex flex-wrap gap-4 rounded-lg border p-3 md:col-span-2">
             {/* POOL DEPTH */}
             <FormField
@@ -921,7 +1099,7 @@ export default function PlaceForm({ id }) {
         )}
 
         {/* STORES AND WAREHOUSES */}
-        {currentHomeType === 'محلات ومخازن' && (
+        {currentHomeType === 'محلات ومخازن' && !id && (
           <div className="flex flex-wrap gap-4 rounded-lg border p-3 md:col-span-2">
             <FormField
               control={form.control}
@@ -957,7 +1135,7 @@ export default function PlaceForm({ id }) {
         )}
 
         {/* FARM */}
-        {currentHomeType === 'مزرعة' && (
+        {currentHomeType === 'مزرعة' && !id && (
           <div className="flex flex-wrap gap-4 rounded-lg border p-3 md:col-span-2">
             <FormField
               control={form.control}
@@ -1059,7 +1237,7 @@ export default function PlaceForm({ id }) {
         )}
 
         {/* LAND */}
-        {currentHomeType === 'أرض' && (
+        {currentHomeType === 'أرض' && !id && (
           <div className="flex flex-wrap gap-4 rounded-lg border p-3 md:col-span-2">
             <FormField
               control={form.control}
@@ -1115,7 +1293,7 @@ export default function PlaceForm({ id }) {
         )}
 
         {/* HOUSE, VILLA & APARTMENT */}
-        {['فيلا / منزل', 'شقة'].includes(currentHomeType) && (
+        {['فيلا / منزل', 'شقة'].includes(currentHomeType) && !id && (
           <div className="flex flex-wrap gap-4 rounded-lg border p-3 md:col-span-2">
             <FormField
               control={form.control}
@@ -1195,7 +1373,7 @@ export default function PlaceForm({ id }) {
         )}
 
         {/* APARTMENT */}
-        {currentHomeType === 'شقة' && (
+        {currentHomeType === 'شقة' && !id && (
           <div className="flex flex-wrap gap-4 rounded-lg border p-3">
             <FormField
               control={form.control}
@@ -1239,38 +1417,41 @@ export default function PlaceForm({ id }) {
         {/* TRIP */}
         {currentHomeType === 'تنظيم رحلات' && (
           <div className="flex flex-wrap gap-4 rounded-lg border p-3">
-            <FormField
-              control={form.control}
-              name="tripLong"
-              render={({ field }) => (
-                <FormItem className="space-y-3">
-                  <FormLabel>مدة الرحلة</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      className="flex flex-wrap gap-3"
-                      dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}
-                    >
-                      {tripPeriodOptions.map((period) => (
-                        <FormItem
-                          key={period}
-                          className="flex items-center gap-x-1 space-y-0"
-                        >
-                          <FormControl>
-                            <RadioGroupItem value={period} />
-                          </FormControl>
-                          <FormLabel className="font-normal">
-                            {period}
-                          </FormLabel>
-                        </FormItem>
-                      ))}
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {!id && (
+              <FormField
+                control={form.control}
+                name="tripLong"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel>مدة الرحلة</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="flex flex-wrap gap-3"
+                        dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}
+                      >
+                        {tripPeriodOptions.map((period) => (
+                          <FormItem
+                            key={period}
+                            className="flex items-center gap-x-1 space-y-0"
+                          >
+                            <FormControl>
+                              <RadioGroupItem value={period} />
+                            </FormControl>
+                            <FormLabel className="font-normal">
+                              {period}
+                            </FormLabel>
+                          </FormItem>
+                        ))}
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
             <FormField
               control={form.control}
               name="tripDate"
@@ -1319,7 +1500,7 @@ export default function PlaceForm({ id }) {
         )}
 
         {/* CHALET */}
-        {currentHomeType === 'شليهات' && (
+        {currentHomeType === 'شليهات' && !id && (
           <FormField
             control={form.control}
             name="chaletDocument"
@@ -1342,7 +1523,7 @@ export default function PlaceForm({ id }) {
         )}
 
         {/* MEETING ROOMS */}
-        {currentHomeType === 'قاعات اجتماعات' && (
+        {currentHomeType === 'قاعات اجتماعات' && !id && (
           <div className="flex flex-wrap gap-4 rounded-lg border p-3">
             <FormField
               control={form.control}

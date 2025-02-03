@@ -89,11 +89,13 @@ export default function PlacePageNew() {
     return <NotFoundPage />;
   }
 
+  console.log(place);
+
   const photos = place.photos?.split(',');
 
   const { bathroom, kitchen, rooms, stages } = JSON.parse(
     JSON.parse(place.number_of_rooms),
-  );
+  ) || {};
 
   const amenities = JSON.parse(JSON.parse(place.amenities));
 
@@ -288,25 +290,28 @@ export default function PlacePageNew() {
                     </Button>
                   )}
 
-                  <ShareButton shareLink={window.location.href} />
+                  <ShareButton shareLink={`https://place.sakanijo.com/place?id=${id}`} />
                 </div>
               )}
             </div>
           </div>
 
-          <hr />
-
-          <div className="my-4 flex flex-wrap gap-2">
-            {amenities?.map((amenity) => (
-              <div
-                key={amenity}
-                className="rounded-sm bg-gray-100 px-2 py-1 text-xs md:rounded-lg md:px-4 md:py-2 md:text-sm"
-              >
-                {amenity}
+          {amenities.length > 0 && (
+            <>
+              <hr />
+              <div className="my-4 flex flex-wrap gap-2">
+                {amenities?.map((amenity) => (
+                  <div
+                    key={amenity}
+                    className="rounded-sm bg-gray-100 px-2 py-1 text-xs md:rounded-lg md:px-4 md:py-2 md:text-sm"
+                  >
+                    {amenity}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-
+            </>
+          )}
+          
           <hr />
 
           <div className="my-2">
@@ -315,7 +320,7 @@ export default function PlacePageNew() {
               {place.description}
             </div>
 
-            {place.sellingMethod === 'booking' && (
+            {place.buyOrRent === 'الحجز' && (
               <p>Max number of guests: {place.maxGuests}</p>
             )}
 
