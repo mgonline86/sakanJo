@@ -200,7 +200,7 @@
     "images": {
       "header": "Photos",
       "description": "more = better",
-      "error": "Upload at least 5 photos!"
+      "error": "Upload at least one image!"
     },
     "description": {
       "header": "Description",

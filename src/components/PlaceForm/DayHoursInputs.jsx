@@ -1,4 +1,3 @@
-import { useEffect, useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 import {
   FormControl,
@@ -9,24 +8,8 @@ import {
 } from '../ui/form';
 import { Input } from '../ui/input';
 
-export default function DayHoursInputs() {
-  const { control, formState, watch, setValue } = useFormContext();
-
-  const [price] = watch(['price']);
-
-  const dirtyFields = useMemo(
-    () => Object.keys(formState.dirtyFields),
-    [formState],
-  );
-
-  useEffect(() => {
-    if (!dirtyFields.includes('priceBeforeNoon')) {
-      setValue('priceBeforeNoon', price);
-    }
-    if (!dirtyFields.includes('priceAfterNoon')) {
-      setValue('priceAfterNoon', price);
-    }
-  }, [price, dirtyFields, setValue]);
+export default function DayHoursInputs({ id }) {
+  const { control } = useFormContext();
 
   return (
     <>
@@ -68,39 +51,41 @@ export default function DayHoursInputs() {
           </FormItem>
         )}
       />
-      <div className='flex gap-4'>
-        <FormField
-          control={control}
-          name="timeOpen.start"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>ميعاد الفتح</FormLabel>
-              <Input
-                {...field}
-                onChange={(e) => field.onChange(e.target.value)}
-                type="time"
-                className="justify-center"
-              />
-            </FormItem>
-          )}
-        />
+      {!id && (
+        <div className="flex gap-4">
+          <FormField
+            control={control}
+            name="timeOpen.start"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>ميعاد الفتح</FormLabel>
+                <Input
+                  {...field}
+                  onChange={(e) => field.onChange(e.target.value)}
+                  type="time"
+                  className="justify-center"
+                />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={control}
-          name="timeOpen.end"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>ميعاد الاغلاق</FormLabel>
-              <Input
-                {...field}
-                onChange={(e) => field.onChange(e.target.value)}
-                type="time"
-                className="justify-center"
-              />
-            </FormItem>
-          )}
-        />
-      </div>
+          <FormField
+            control={control}
+            name="timeOpen.end"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>ميعاد الاغلاق</FormLabel>
+                <Input
+                  {...field}
+                  onChange={(e) => field.onChange(e.target.value)}
+                  type="time"
+                  className="justify-center"
+                />
+              </FormItem>
+            )}
+          />
+        </div>
+      )}
     </>
   );
 }

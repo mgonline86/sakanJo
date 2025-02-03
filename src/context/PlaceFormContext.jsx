@@ -2,123 +2,170 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { placeFormSchema, weekDays } from './PlaceFormSchema';
+import { jordanCities } from '@/data/jordanCities';
+import { imageUrlToFile } from '@/utils';
 
-const getPlacePhotos = (photos, folderName) => {
-  if (!photos) return [];
-  return photos
-    ?.split(',')
-    .map(
-      (photo) =>
+// const getPlacePhotos = (photos, folderName) => {
+//   if (!photos) return [];
+//   return photos
+//     ?.split(',')
+//     .map(
+//       (photo) =>
+//         `https://backend.sakanijo.com/api/images/${encodeURIComponent(folderName)}/${encodeURIComponent(photo)}`,
+//     );
+// };
+
+export const getPlacePhotos = async (photos, folderName) => {
+  if (!photos || !folderName) return [];
+  const photosUrls = photos?.split(',');
+
+  const result = await Promise.all(
+    photosUrls.map(async (photo) => {
+      return await imageUrlToFile(
         `https://backend.sakanijo.com/api/images/${encodeURIComponent(folderName)}/${encodeURIComponent(photo)}`,
-    );
+        photo,
+      );
+    }),
+  );
+  return result;
 };
 
-export const usePlaceForm = (t, place = null) =>
+const getAddressParent = (address) => {
+  if (!address) return '';
+
+  const cities = Object.entries(jordanCities);
+
+  for (const [key, value] of cities) {
+    for (const place of value.places) {
+      if (place.name === address) {
+        return [key, `${place.name}|${place.long}|${place.lat}`];
+      }
+    }
+  }
+  return ['', ''];
+};
+
+export const usePlaceForm = (t, place = null, photos = []) =>
   useForm({
     resolver: zodResolver(placeFormSchema(t)),
     defaultValues: {
       type: null, // --> old api cancelled
       sellingMethod: null, // --> old api cancelled
 
-      homeType: 'فيلا / منزل', // نوع المنزل (شقة/شليه:/الخ)
+      homeType: place?.home_type || 'فيلا / منزل', // نوع المنزل (شقة/شليه:/الخ)
       title: place?.title || '', // ??! NOT FOUND ??!
       description: place?.description || '', // ??! NOT FOUND ??!
-      existingPhotos: getPlacePhotos(place?.photos, place?.folderName) || [],
-      images: [], // ??! NOT FOUND ??!
-      buyOrRent: 'للبيع', // نوع البيع (للبيع/الإيجار/الحجز)
-      adsAccept: 'لا', // هون ااعلان يستقبل (قابل لتفاوض/تقسيط/لا)
-      gettingCalls: 'whatsapp', // الاعلان يستقبل رسايل عبر (whatsapp/sms)
+      // existingPhotos: getPlacePhotos(place?.photos, place?.folderName) || [],
+      existingPhotos: [],
+      images: photos, // ??! NOT FOUND ??!
+      buyOrRent: place?.buy_or_rent || 'للبيع', // نوع البيع (للبيع/الإيجار/الحجز)
+      adsAccept: place?.ads_accept || 'لا', // هون ااعلان يستقبل (قابل لتفاوض/تقسيط/لا)
+      gettingCalls: place?.gettingCalls || 'whatsapp', // الاعلان يستقبل رسايل عبر (whatsapp/sms)
       // ownerStatus: '', // حالة المعلن (وسيط/مالك) --> old api cancelled
-      publisherState: 'مالك', // هون متا الاولى حالة المعلن وسيط او مالك
-      price: 1, // general price
-
-      // get it from user
-      owner_id: null,
-      ownerPhone: '', //  رقم هاتف المعلن
-      ownerName: '', // اسم المعلن
+      publisherState: place?.publisher_state || 'مالك', // هون متا الاولى حالة المعلن وسيط او مالك
+      price: place?.price ? Number(place?.price) : 1, // general price
 
       // depend on homeType
-      amenities: [], // هون بتخزن array فيها مزايا العقار
+      amenities:
+        place?.amenities?.length > 2
+          ? JSON.parse(JSON.parse(place?.amenities))
+          : [], // هون بتخزن array فيها مزايا العقار
 
-      address: undefined, // بتخزن هنا عنوان المكان
+      address: place?.address ? getAddressParent(place?.address) : ['', ''], // بتخزن هنا عنوان المكان
       // location: '',
-      street: '', // string الحي
-      closePlace: '', // string ??! مكان قريب
-      longitude: 0, // احداتيات المنطقة في الخريطة of place
-      latitude: 0, // احداتيات المنطقة في الخريطة of place
-      spaceGeneral: 1, // مساحة العقار(رقم)
+      street: place?.street || '', // string الحي
+      closePlace: place?.closePlace || '', // string ??! مكان قريب
+      longitude: place?.longitude ? Number(place?.longitude) : 0, // احداتيات المنطقة في الخريطة of place
+      latitude: place?.latitude ? Number(place?.latitude) : 0, // احداتيات المنطقة في الخريطة of place
+      spaceGeneral: place?.space_general ? Number(place?.space_general) : 1, // مساحة العقار(رقم)
 
       // pricing info
-      priceHide: false, // priceHide, اخفاء السعر (true/false)
+      priceHide: place?.priceHide || false, // priceHide, اخفاء السعر (true/false)
 
       // if rent
-      rentType: undefined, // نوع الاليجار (شهري/سنوي)
+      rentType: place?.rentType || 'شهري', // نوع الاليجار (شهري/سنوي)
 
       // if hajez
-      hajezDays: weekDays, // هون بتخزن array فيها ايام الاسبوع الي مسموح فيها الحجز متال ['الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت','الأحد',]
-      hajezType: '24ساعة', // نوع الحجز المسموح فيه (24ساعة/12ساعة)
-      variablePrices: {}, // هون السعر متغير حسب الايام القيمة الولية هي {} اوبجيكت فارغ  بس ادا اختار العميل السعر متغير بتدخل سعر حسب الايام متال {الخميس:150، الاحد:200}
-      specificDaysInCalander: [], // هون بتحط ايام معينة في السنة  داخل array
+      hajezDays:
+        place?.hajez_days?.length > 2
+          ? JSON.parse(JSON.parse(place?.hajez_days))
+          : weekDays, // هون بتخزن array فيها ايام الاسبوع الي مسموح فيها الحجز متال ['الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت','الأحد',]
+      hajezType: place?.hajezType || '24ساعة', // نوع الحجز المسموح فيه (24ساعة/12ساعة)
+      variablePrices:
+        place?.variable_prices?.length > 2
+          ? JSON.parse(JSON.parse(place?.variable_prices))
+          : {}, // هون السعر متغير حسب الايام القيمة الولية هي {} اوبجيكت فارغ  بس ادا اختار العميل السعر متغير بتدخل سعر حسب الايام متال {الخميس:150، الاحد:200}
+      specificDaysInCalander:
+        place?.specificDaysInCalendar?.length > 2
+          ? JSON.parse(JSON.parse(place?.specificDaysInCalendar)).map((day) => new Date(day))
+          : [], // هون بتحط ايام معينة في السنة  داخل array
       // specificDaysCalanderPrice: [100, 200], // هون بتحط السعر لكل يوم من تلك الايام داخل array  القيمة الولية هي null  // I think not used
-      calanderDaysPrice: {}, // "{"2025-01-05":"12000","2025-01-04":"11000","2025-02-26":"14000","2025-02-13":"13000"}"
+      calanderDaysPrice: place?.calanderDaysPrice?.length > 2 ? JSON.parse(place?.calanderDaysPrice) : {}, // "{"2025-01-05":"12000","2025-01-04":"11000","2025-02-26":"14000","2025-02-13":"13000"}"
 
       // فقط المسابح والإجتامعات وصالات الرياضة والملاعب
-      priceBeforeNoon: 1, // سعر قبل الضهيرة
-      priceAfterNoon: 1, // سعر في المساء و بعد الضهيرة
+      priceBeforeNoon: place?.priceBeforeNoon? Number(place?.priceBeforeNoon) : "", // سعر قبل الضهيرة
+      priceAfterNoon: place?.priceAfterNoon ? Number(place?.priceAfterNoon) : "", // سعر في المساء و بعد الضهيرة
       // هون ادا خلىً القيمة فارغة خلي في هادا السعر نفس قسمة السعر price gneral
-      timeOpen: {
-        start: "00:00",
-        end: "23:59",
+      timeOpen: place?.timeOpen?.length > 2 ? JSON.parse(place?.timeOpen) : {
+        start: '00:00',
+        end: '23:59',
       }, // وقت فتح المحل بتخزن زي هيك {end:10:00, start:6:00}
 
       // if pool or gym
-      poolType: 'رجالي', // نوع المسبح او الصالة الرياضية (رجالي/نسائي)
+      poolType: place?.poolType || 'رجالي', // نوع المسبح او الصالة الرياضية (رجالي/نسائي)
 
       // if pool
-      deepPool: '1متر', // عمق المسبح (5متر/1متر/3متر)
-      poolDocument: "", // ??! NOT FOUND ??! File PDF|Image
+      deepPool: place?.deepPool || '1متر', // عمق المسبح (5متر/1متر/3متر)
+      poolDocument: '', // ??! NOT FOUND ??! File PDF|Image
 
       // if store
-      containSdah: false, // هل يحتوي المحل على سده (true/false)
-      evacuation: false, // (true/false)
+      containSdah: place?.containSdah || false, // هل يحتوي المحل على سده (true/false)
+      evacuation: place?.evacuation || false, // (true/false)
 
       // if farm
-      farmHasHouse: '', // هل المزرعة فيها منزل (نعم/لا)
-      farmHasWater: '', // هل المزرعة فيها مياه (نعم/لا)
-      farmHasFarmed: '', // هل المزرعة مزروعة (نعم /لا)
+      farmHasHouse: place?.farmHasHouse || 'لا', // هل المزرعة فيها منزل (نعم/لا)
+      farmHasWater: place?.farmHasWater || 'لا', // هل المزرعة فيها مياه (نعم/لا)
+      farmHasFarmed: place?.farmHasFarmed || 'لا', // هل المزرعة مزروعة (نعم /لا)
 
       // if land
-      landInFaceOfStreet: '', // هل الارض امامها شارع (نعم/لا)
-      numberOfStreetsInLand: 0, // عدد الشوارع امام الارض (رقم)
+      landInFaceOfStreet: place?.landInFaceOfStreet || 'لا', // هل الارض امامها شارع (نعم/لا)
+      numberOfStreetsInLand: place?.numberOfStreetsInLand || 0, // عدد الشوارع امام الارض (رقم)
 
       // if apartment or house/villa
-      numberOfRooms: {
-        // عدد الغرف لازم تكون زي هيك
-        kitchen: 1,
-        rooms: 1,
-        bathroom: 1,
-        stages: 1, // if villa or house
-      },
+      numberOfRooms:
+        place?.number_of_rooms?.length > 2
+          ? JSON.parse(JSON.parse(place?.number_of_rooms))
+          : {
+              // عدد الغرف لازم تكون زي هيك
+              kitchen: 1,
+              rooms: 1,
+              bathroom: 1,
+              stages: 1, // if villa or house
+            },
 
       // if apartment
-      numberOfHomeStage: 1, // الشقة في الطابق رقم (رقم)
-      totalStages: 1, // عدد الطوابق في البيت (رقم)
+      numberOfHomeStage: place?.numberOfHomeStage
+        ? Number(place?.numberOfHomeStage)
+        : 1, // الشقة في الطابق رقم (رقم)
+      totalStages: place?.totalStages ? Number(place?.totalStages) : 1, // عدد الطوابق في البيت (رقم)
 
       // if trip
-      tripLong: '', // مدة الرحلة(15days / 1month )
-      tripDate: '', // موعد الرحلة بتخزن هون تاريخ
+      tripLong: place?.tripLong || '', // مدة الرحلة(15days / 1month )
+      tripDate: place?.tripDate? new Date(place?.tripDate) : '', // موعد الرحلة بتخزن هون تاريخ
 
       // if chalet
       chaletDocument: null, // File PDF|Image
 
       // if meeting room
-      meetingRoomType: '', // نوع غرفة الاجتماعات اختياري بين الانواع التالية :[  "غرفة على شكل U","مسرح","قاعة درس","مكان للعمل الجماعي","بيانات"]
-      countPeople: 3, // عدد الاشخاص المسموح بيهم في غرفة الاجتماعات (رقم)
+      meetingRoomType: place?.meetingRoomType || '', // نوع غرفة الاجتماعات اختياري بين الانواع التالية :[  "غرفة على شكل U","مسرح","قاعة درس","مكان للعمل الجماعي","بيانات"]
+      countPeople: place?.countPeople ? Number(place?.countPeople) : 3, // عدد الاشخاص المسموح بيهم في غرفة الاجتماعات (رقم)
 
       // if gym
-      subscriptionTypeGym: 'شهر', // نوع الاشتراك في الصالة الرياضية: [شهر, تلاتة اشهر,سنة
+      subscriptionTypeGym: place?.subscriptionTypeGym || 'شهر', // نوع الاشتراك في الصالة الرياضية: [شهر, تلاتة اشهر,سنة
 
       // postsLimit: 0, // Add limitation on creation by key "limitPosts" from user object and update loc
+
+      folderName: place?.folderName || undefined,
     },
   });
 
@@ -126,8 +173,8 @@ export const usePlaceForm = (t, place = null) =>
  * Context
  */
 
-export const PlaceFormProvider = ({ children, place = null }) => {
+export const PlaceFormProvider = ({ children, place = null, photos = [] }) => {
   const { t } = useTranslation();
-  const methods = usePlaceForm(t, place);
+  const methods = usePlaceForm(t, place, photos);
   return <FormProvider {...methods}> {children} </FormProvider>;
 };

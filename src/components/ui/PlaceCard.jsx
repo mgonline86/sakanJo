@@ -1,3 +1,4 @@
+import { Campaign } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 
 const PlaceCard = ({ place }) => {
@@ -17,9 +18,10 @@ const PlaceCard = ({ place }) => {
               alt={place.title}
             />
             {!!sponsored && (
-              <span className="absolute bottom-2 right-2 z-10 rounded-lg bg-green-500 px-2 py-1 text-xs font-bold text-white">
-                {t('sponsored')}
-              </span>
+              <div className="absolute bottom-2 right-2 z-10 flex items-center gap-1 rounded-lg bg-green-500 px-2 py-1 text-xs font-bold text-white">
+                <Campaign className='w-5 h-5 rtl:-scale-x-100' />
+                <span>{t('sponsored')}</span>
+              </div>
             )}
             <div
               className="absolute left-2 top-2"

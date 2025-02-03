@@ -17,7 +17,7 @@ const ProfilePage = () => {
   const { user, logout } = auth;
   const [redirect, setRedirect] = useState(null);
 
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const userPictureLink = useMemo(() => {
     if (!user) {

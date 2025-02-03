@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../hooks';
-import logo from '../../../public/assets/logo.png';
+import logo from '@/assets/logo.png';
 import SearchBar from './SearchBar';
 import { Button } from './button';
 export const Header = () => {
@@ -44,7 +44,7 @@ export const Header = () => {
 
   return (
     <header
-      className={`fixed top-0 z-10 flex w-screen justify-center bg-white px-4 py-4 ${
+      className={`fixed top-0 z-50 flex w-screen justify-center bg-white px-4 py-4 ${
         hasShadow ? 'shadow-md' : ''
       }`}
     >
