@@ -21,6 +21,8 @@ export const weekDays = [
   'الجمعة',
 ];
 
+export const rentTypeOptions = ['شهري', 'سنوي'];
+
 export const yesNo = ['نعم', 'لا'];
 
 export const hajezHours = ['24ساعة', '12ساعة'];
@@ -159,7 +161,7 @@ const sellingTypeSchema = z.discriminatedUnion('buyOrRent', [
   // rent only
   z.object({
     buyOrRent: z.literal('للإيجار'),
-    rentType: z.enum(['شهري', 'سنوي']),
+    rentType: z.enum(rentTypeOptions),
   }),
 
   z.object({
@@ -222,8 +224,10 @@ export const placeFormSchema = (t) =>
         message: t('new_ad.images.error'),
       }).max(10),
 
-      priceBeforeNoon: z.number().min(1).optional(),
-      priceAfterNoon: z.number().min(1).optional(),
+      priceBeforeNoon: z.number().min(1).or(z.literal("")),
+      priceAfterNoon: z.number().min(1).or(z.literal("")),
+
+      folderName: z.string().nullish(),
     })
     .and(sellingTypeSchema)
     .and(homeTypeSchema);

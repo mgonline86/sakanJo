@@ -89,11 +89,13 @@ export default function PlacePageNew() {
     return <NotFoundPage />;
   }
 
+  console.log(place);
+
   const photos = place.photos?.split(',');
 
   const { bathroom, kitchen, rooms, stages } = JSON.parse(
     JSON.parse(place.number_of_rooms),
-  );
+  ) || {};
 
   const amenities = JSON.parse(JSON.parse(place.amenities));
 
@@ -288,7 +290,7 @@ export default function PlacePageNew() {
                     </Button>
                   )}
 
-                  <ShareButton shareLink={window.location.href} />
+                  <ShareButton shareLink={`https://place.sakanijo.com/place?id=${id}`} />
                 </div>
               )}
             </div>

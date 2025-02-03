@@ -1,16 +1,19 @@
 import PlaceForm from '@/components/PlaceForm';
 import AccountNav from '@/components/ui/AccountNav';
-import Spinner from '@/components/ui/Spinner';
 import { Button } from '@/components/ui/button';
-import { PlaceFormProvider, getPlacePhotos } from '@/context/PlaceFormContext';
-import { ArrowBack } from '@mui/icons-material';
+import { getPlacePhotos, PlaceFormProvider } from '@/context/PlaceFormContext';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../hooks';
+import { ArrowBack } from '@mui/icons-material';
+import Spinner from '@/components/ui/Spinner';
+import TogglePlaceActivity from '@/components/TogglePlaceActivity';
+import DeletePlaceAlertDialog from '@/components/DeletePlaceAlertDialog';
+import NotFoundPage from './NotFoundPage';
 
-export default function PlacesFormPage() {
+export default function PlacesUpdateFormPage() {
   const { id } = useParams();
 
   const navigate = useNavigate();
@@ -50,8 +53,12 @@ export default function PlacesFormPage() {
     return <Spinner />;
   }
 
+  if (!place) {
+    return <NotFoundPage />;
+  }
+
   /* Check if the user is the owner of the place */
-  if (place !== undefined && place?.owner_id !== user?.id) {
+  if (place?.owner_id !== user?.id) {
     return (
       <>
         <AccountNav />
@@ -72,6 +79,10 @@ export default function PlacesFormPage() {
     <>
       <AccountNav />
       <PlaceFormProvider place={place} photos={photos}>
+        <div className='flex justify-end px-4 gap-2'>
+          <TogglePlaceActivity id={id} initialState={place?.active} />
+          <DeletePlaceAlertDialog id={id} />
+        </div>
         <PlaceForm id={id} />
       </PlaceFormProvider>
     </>

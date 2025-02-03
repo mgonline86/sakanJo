@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../hooks';
-import logo from '../../../public/assets/logo.png';
+import logo from '@/assets/logo.png';
 import SearchBar from './SearchBar';
 import { Button } from './button';
 export const Header = () => {
