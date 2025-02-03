@@ -11,6 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { DeleteForever } from '@mui/icons-material';
 import axios from 'axios';
+import { useAuth } from '../../hooks';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -23,6 +24,7 @@ const deletePlace = async (id) => {
 };
 
 export default function DeletePlaceAlertDialog({ id }) {
+  const { user, setUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
@@ -34,6 +36,15 @@ export default function DeletePlaceAlertDialog({ id }) {
       if (response.status < 400) {
         setOpen(false);
         toast.success('تم حذف الإعلان بنجاح');
+
+        // update user limitPosts
+        const updatedUser = {
+          ...user,
+          limitPosts: user.limitPosts >= 0 ? user.limitPosts + 1 : 1,
+        };
+        setUser(updatedUser);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+
         navigate('/account/places');
       } else {
         toast.error('حدث خطأ أثناء حذف الإعلان');
