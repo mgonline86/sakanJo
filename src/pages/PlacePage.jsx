@@ -89,8 +89,6 @@ export default function PlacePageNew() {
     return <NotFoundPage />;
   }
 
-  console.log(place);
-
   const photos = place.photos?.split(',');
 
   const { bathroom, kitchen, rooms, stages } = JSON.parse(

@@ -873,7 +873,7 @@ export default function PlaceForm({ id }) {
         )}
 
         {/* IF HAJEZ */}
-        {buyOrRent === 'الحجز' && (
+        {buyOrRent === 'الحجز' && currentHomeType !== 'صالات رياضة' && (
           <>
             {/* HAJEZ DAYS */}
             {!id && (
