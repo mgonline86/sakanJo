@@ -5,7 +5,7 @@ import PlaceImg from './PlaceImg';
 const InfoCard = ({ place }) => {
   return (
     <Link
-      to={`/place/${place.id}`}
+      to={`/account/places/${place.id}`}
       className="my-3 flex cursor-pointer flex-col gap-4 rounded-2xl bg-gray-100 p-4 transition-all hover:bg-gray-300 md:flex-row"
       key={place.id}
     >
