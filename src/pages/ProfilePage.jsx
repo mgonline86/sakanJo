@@ -11,6 +11,7 @@ import { LogOut, Phone, Text } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks';
 import PlacesPage from './PlacesPage';
+import ProfileImageUpdateDialog from '@/components/ProfileImageUpdateDialog';
 
 const ProfilePage = () => {
   const auth = useAuth();
@@ -59,7 +60,14 @@ const ProfilePage = () => {
       {subpage === 'profile' && (
         <div className="m-4 flex flex-col items-center gap-8 rounded-[10px]  p-4 sm:h-1/5 sm:flex-row sm:items-stretch lg:gap-28 lg:pl-32 lg:pr-20">
           {/* avatar */}
-          <div className="flex h-40 w-40 justify-center rounded-full bg-gray-200 p-4  sm:h-72 sm:w-72 md:h-96 md:w-96">
+          <div className="relative flex h-40 w-40 justify-center overflow-clip rounded-full bg-gray-200 p-4  sm:h-72 sm:w-72 md:h-96 md:w-96">
+            <ProfileImageUpdateDialog
+              userId={user?.id}
+              triggerBtnProps={{
+                className: 'absolute z-10 bottom-0 w-full h-1/3 opacity-80',
+                variant: 'ghost',
+              }}
+            />
             <Avatar>
               {user ? (
                 <AvatarImage src={userPictureLink} />
