@@ -37,11 +37,13 @@ import { amenitiesOptions } from '@/data/amenitiesOptions';
 import { jordanCities } from '@/data/jordanCities';
 import { cn } from '@/lib/utils';
 import { CalendarMonth, CloudUpload, DeleteForever } from '@mui/icons-material';
+import axios from 'axios';
 import { format } from 'date-fns';
 import { serialize } from 'object-to-formdata';
 import { useEffect, useMemo, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../../hooks';
 import { Calendar } from '../ui/calendar';
@@ -51,8 +53,6 @@ import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 import { Switch } from '../ui/switch';
 import DayHoursInputs from './DayHoursInputs';
 import HajezSpecificDays from './HajezSpecificDays';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 
 const addNewPlace = async (formData) => {
   console.log('calling addNewPlace', formData);
@@ -99,7 +99,7 @@ const dayHoursHomeTypes = ['مسابح', 'قاعات اجتماعات', 'صال�
 export default function PlaceForm({ id }) {
   const { t, i18n } = useTranslation();
 
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
 
   const form = useFormContext();
 
@@ -262,8 +262,6 @@ export default function PlaceForm({ id }) {
       }
     }
 
-    console.log('payload', payload);
-
     const serializeOptions = {
       noFilesWithArrayNotation: true,
     };
@@ -277,6 +275,16 @@ export default function PlaceForm({ id }) {
 
       if (res.status < 400) {
         toast.success(t('new_ad.submit_success'));
+
+        const updateUserObject = {
+          ...user,
+          limitPosts: user.limitPosts > 1 ? user.limitPosts - 1 : 0,
+        };
+
+        localStorage.setItem('user', JSON.stringify(updateUserObject));
+
+        setUser(updateUserObject);
+
         navigate('/account/places');
       } else {
         toast.error(t('new_ad.submit_error'));
@@ -314,16 +322,6 @@ export default function PlaceForm({ id }) {
 
   if (!user) {
     return null;
-  }
-
-  if (user.limitPosts < 1) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <h1 className="text-2xl font-semibold text-red-600">
-          {t('limit_reached')}
-        </h1>
-      </div>
-    );
   }
 
   return (

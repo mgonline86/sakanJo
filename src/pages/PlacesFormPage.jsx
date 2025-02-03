@@ -50,21 +50,18 @@ export default function PlacesFormPage() {
     return <Spinner />;
   }
 
-  /* Check if the user is the owner of the place */
-  if (place !== undefined && place?.owner_id !== user?.id) {
+
+  if (!user) {
+    navigate('/login');
+  }
+
+  if (user.limitPosts < 1) {
     return (
-      <>
-        <AccountNav />
-        <h2 className="mt-12 text-center text-2xl font-semibold text-red-500 md:text-4xl">
-          {t('unauthorized_error')}
-        </h2>
-        <Button
-          onClick={() => navigate('/account/places')}
-          className="mx-auto mt-6 w-full max-w-xs"
-        >
-          <ArrowBack className="me-2" /> {t('back')}
-        </Button>
-      </>
+      <div className="flex h-full items-center justify-center">
+        <h1 className="text-2xl font-semibold text-red-600">
+          {t('limit_reached')}
+        </h1>
+      </div>
     );
   }
 

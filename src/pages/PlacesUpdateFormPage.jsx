@@ -1,7 +1,11 @@
 import PlaceForm from '@/components/PlaceForm';
 import AccountNav from '@/components/ui/AccountNav';
 import { Button } from '@/components/ui/button';
-import { getDocument, getPlacePhotos, PlaceFormProvider } from '@/context/PlaceFormContext';
+import {
+  getDocument,
+  getPlacePhotos,
+  PlaceFormProvider,
+} from '@/context/PlaceFormContext';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -42,8 +46,18 @@ export default function PlacesUpdateFormPage() {
         setPhotos(
           await getPlacePhotos(response.data.photos, response.data.folderName),
         );
-        setPoolDocument(await getDocument(response.data.poolDocument, response.data.folderName));
-        setChaletDocument(await getDocument(response.data.chaletDocument, response.data.folderName));
+        setPoolDocument(
+          await getDocument(
+            response.data.poolDocument,
+            response.data.folderName,
+          ),
+        );
+        setChaletDocument(
+          await getDocument(
+            response.data.chaletDocument,
+            response.data.folderName,
+          ),
+        );
       } catch (error) {
         console.error('Error fetching place:', error);
       } finally {
@@ -55,6 +69,10 @@ export default function PlacesUpdateFormPage() {
 
   if (loading) {
     return <Spinner />;
+  }
+
+  if (!user) {
+    navigate('/login');
   }
 
   if (!place) {
