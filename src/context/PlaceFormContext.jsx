@@ -3,17 +3,8 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { placeFormSchema, weekDays } from './PlaceFormSchema';
 import { jordanCities } from '@/data/jordanCities';
-import { imageUrlToFile } from '@/utils';
+import { imageUrlToFile, pdfUrlToFile } from '@/utils';
 
-// const getPlacePhotos = (photos, folderName) => {
-//   if (!photos) return [];
-//   return photos
-//     ?.split(',')
-//     .map(
-//       (photo) =>
-//         `https://backend.sakanijo.com/api/images/${encodeURIComponent(folderName)}/${encodeURIComponent(photo)}`,
-//     );
-// };
 
 export const getPlacePhotos = async (photos, folderName) => {
   if (!photos || !folderName) return [];
@@ -28,6 +19,24 @@ export const getPlacePhotos = async (photos, folderName) => {
     }),
   );
   return result;
+};
+
+export const getDocument = async (document, folderName) => {
+  if (!document || !folderName) return [];
+  // check file extension
+  const isPDF = document.split('.').pop() === 'pdf';
+
+  if (isPDF) {
+    return await pdfUrlToFile(
+      `https://backend.sakanijo.com/api/images/${encodeURIComponent(folderName)}/${encodeURIComponent(document)}`,
+      document,
+    );
+  }
+
+  return await pdfUrlToFile(
+    `https://backend.sakanijo.com/api/images/${encodeURIComponent(folderName)}/${encodeURIComponent(document)}`,
+    document,
+  );
 };
 
 const getAddressParent = (address) => {
@@ -45,7 +54,7 @@ const getAddressParent = (address) => {
   return ['', ''];
 };
 
-export const usePlaceForm = (t, place = null, photos = []) =>
+export const usePlaceForm = (t, place = null, photos = [], poolDocument = '', chaletDocument = '') =>
   useForm({
     resolver: zodResolver(placeFormSchema(t)),
     defaultValues: {
@@ -55,8 +64,7 @@ export const usePlaceForm = (t, place = null, photos = []) =>
       homeType: place?.home_type || 'فيلا / منزل', // نوع المنزل (شقة/شليه:/الخ)
       title: place?.title || '', // ??! NOT FOUND ??!
       description: place?.description || '', // ??! NOT FOUND ??!
-      // existingPhotos: getPlacePhotos(place?.photos, place?.folderName) || [],
-      existingPhotos: [],
+      existingPhotos: "",
       images: photos, // ??! NOT FOUND ??!
       buyOrRent: place?.buy_or_rent || 'للبيع', // نوع البيع (للبيع/الإيجار/الحجز)
       adsAccept: place?.ads_accept || 'لا', // هون ااعلان يستقبل (قابل لتفاوض/تقسيط/لا)
@@ -97,26 +105,38 @@ export const usePlaceForm = (t, place = null, photos = []) =>
           : {}, // هون السعر متغير حسب الايام القيمة الولية هي {} اوبجيكت فارغ  بس ادا اختار العميل السعر متغير بتدخل سعر حسب الايام متال {الخميس:150، الاحد:200}
       specificDaysInCalander:
         place?.specificDaysInCalendar?.length > 2
-          ? JSON.parse(JSON.parse(place?.specificDaysInCalendar)).map((day) => new Date(day))
+          ? JSON.parse(JSON.parse(place?.specificDaysInCalendar)).map(
+              (day) => new Date(day),
+            )
           : [], // هون بتحط ايام معينة في السنة  داخل array
       // specificDaysCalanderPrice: [100, 200], // هون بتحط السعر لكل يوم من تلك الايام داخل array  القيمة الولية هي null  // I think not used
-      calanderDaysPrice: place?.calanderDaysPrice?.length > 2 ? JSON.parse(place?.calanderDaysPrice) : {}, // "{"2025-01-05":"12000","2025-01-04":"11000","2025-02-26":"14000","2025-02-13":"13000"}"
+      calanderDaysPrice:
+        place?.calanderDaysPrice?.length > 2
+          ? JSON.parse(place?.calanderDaysPrice)
+          : {}, // "{"2025-01-05":"12000","2025-01-04":"11000","2025-02-26":"14000","2025-02-13":"13000"}"
 
       // فقط المسابح والإجتامعات وصالات الرياضة والملاعب
-      priceBeforeNoon: place?.priceBeforeNoon? Number(place?.priceBeforeNoon) : "", // سعر قبل الضهيرة
-      priceAfterNoon: place?.priceAfterNoon ? Number(place?.priceAfterNoon) : "", // سعر في المساء و بعد الضهيرة
+      priceBeforeNoon: place?.priceBeforeNoon
+        ? Number(place?.priceBeforeNoon)
+        : '', // سعر قبل الضهيرة
+      priceAfterNoon: place?.priceAfterNoon
+        ? Number(place?.priceAfterNoon)
+        : '', // سعر في المساء و بعد الضهيرة
       // هون ادا خلىً القيمة فارغة خلي في هادا السعر نفس قسمة السعر price gneral
-      timeOpen: place?.timeOpen?.length > 2 ? JSON.parse(place?.timeOpen) : {
-        start: '00:00',
-        end: '23:59',
-      }, // وقت فتح المحل بتخزن زي هيك {end:10:00, start:6:00}
+      timeOpen:
+        place?.timeOpen?.length > 2
+          ? JSON.parse(place?.timeOpen)
+          : {
+              start: '00:00',
+              end: '23:59',
+            }, // وقت فتح المحل بتخزن زي هيك {end:10:00, start:6:00}
 
       // if pool or gym
       poolType: place?.poolType || 'رجالي', // نوع المسبح او الصالة الرياضية (رجالي/نسائي)
 
       // if pool
       deepPool: place?.deepPool || '1متر', // عمق المسبح (5متر/1متر/3متر)
-      poolDocument: '', // ??! NOT FOUND ??! File PDF|Image
+      poolDocument: poolDocument, // ??! NOT FOUND ??! File PDF|Image
 
       // if store
       containSdah: place?.containSdah || false, // هل يحتوي المحل على سده (true/false)
@@ -151,10 +171,10 @@ export const usePlaceForm = (t, place = null, photos = []) =>
 
       // if trip
       tripLong: place?.tripLong || '', // مدة الرحلة(15days / 1month )
-      tripDate: place?.tripDate? new Date(place?.tripDate) : '', // موعد الرحلة بتخزن هون تاريخ
+      tripDate: place?.tripDate ? new Date(place?.tripDate) : '', // موعد الرحلة بتخزن هون تاريخ
 
       // if chalet
-      chaletDocument: null, // File PDF|Image
+      chaletDocument: chaletDocument, // File PDF|Image
 
       // if meeting room
       meetingRoomType: place?.meetingRoomType || '', // نوع غرفة الاجتماعات اختياري بين الانواع التالية :[  "غرفة على شكل U","مسرح","قاعة درس","مكان للعمل الجماعي","بيانات"]
@@ -173,8 +193,8 @@ export const usePlaceForm = (t, place = null, photos = []) =>
  * Context
  */
 
-export const PlaceFormProvider = ({ children, place = null, photos = [] }) => {
+export const PlaceFormProvider = ({ children, place = null, photos = [], poolDocument = '', chaletDocument = '' }) => {
   const { t } = useTranslation();
-  const methods = usePlaceForm(t, place, photos);
+  const methods = usePlaceForm(t, place, photos, poolDocument, chaletDocument);
   return <FormProvider {...methods}> {children} </FormProvider>;
 };

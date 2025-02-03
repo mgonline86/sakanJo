@@ -1,7 +1,7 @@
 import PlaceForm from '@/components/PlaceForm';
 import AccountNav from '@/components/ui/AccountNav';
 import { Button } from '@/components/ui/button';
-import { getPlacePhotos, PlaceFormProvider } from '@/context/PlaceFormContext';
+import { getDocument, getPlacePhotos, PlaceFormProvider } from '@/context/PlaceFormContext';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -22,6 +22,8 @@ export default function PlacesUpdateFormPage() {
 
   const [place, setPlace] = useState();
   const [photos, setPhotos] = useState();
+  const [poolDocument, setPoolDocument] = useState('');
+  const [chaletDocument, setChaletDocument] = useState('');
   const [loading, setLoading] = useState(true);
 
   const { user } = useAuth();
@@ -40,6 +42,8 @@ export default function PlacesUpdateFormPage() {
         setPhotos(
           await getPlacePhotos(response.data.photos, response.data.folderName),
         );
+        setPoolDocument(await getDocument(response.data.poolDocument, response.data.folderName));
+        setChaletDocument(await getDocument(response.data.chaletDocument, response.data.folderName));
       } catch (error) {
         console.error('Error fetching place:', error);
       } finally {
@@ -78,8 +82,13 @@ export default function PlacesUpdateFormPage() {
   return (
     <>
       <AccountNav />
-      <PlaceFormProvider place={place} photos={photos}>
-        <div className='flex justify-end px-4 gap-2'>
+      <PlaceFormProvider
+        place={place}
+        photos={photos}
+        poolDocument={poolDocument}
+        chaletDocument={chaletDocument}
+      >
+        <div className="flex justify-end gap-2 px-4">
           <TogglePlaceActivity id={id} initialState={place?.active} />
           <DeletePlaceAlertDialog id={id} />
         </div>

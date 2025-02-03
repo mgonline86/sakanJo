@@ -219,7 +219,7 @@ export const placeFormSchema = (t) =>
       price: z.number().min(1),
       priceHide: z.boolean(),
 
-      existingPhotos: z.array(z.string()).nullish(),
+      existingPhotos: z.string().nullish(),
       images: z.array(z.instanceof(File)).min(1, {
         message: t('new_ad.images.error'),
       }).max(10),
