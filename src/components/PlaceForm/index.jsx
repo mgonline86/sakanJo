@@ -392,6 +392,13 @@ export default function PlaceForm({ id }) {
       setHideMiddleStage(false);
     }
   };
+  
+  const handleUpdateBuyOrRent = (newValue) => {
+    const homeType = currentHomeType;
+    form.reset();
+    form.setValue('homeType', homeType);
+    form.setValue('buyOrRent', newValue);
+  };
 
   const handleCityChange = (field, newValue) => {
     field.onChange(newValue);
@@ -504,7 +511,7 @@ export default function PlaceForm({ id }) {
                     <FormLabel>{t('new_ad.type.header')}</FormLabel>
                     <FormControl>
                       <RadioGroup
-                        onValueChange={field.onChange}
+                        onValueChange={handleUpdateBuyOrRent}
                         defaultValue={field.value}
                         className="flex flex-wrap gap-4"
                         dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}
@@ -753,89 +760,92 @@ export default function PlaceForm({ id }) {
             />
           )}
 
-          {/* ADDRESS - CITY */}
-          {!id && (
-            <FormField
-              control={form.control}
-              name="address[0]"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>المدينة</FormLabel>
-                  <Select
-                    onValueChange={(value) => handleCityChange(field, value)}
-                    defaultValue={field.value}
-                    value={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="my-2 capitalize rtl:direction-rtl">
-                        <SelectValue placeholder="إختار المدينة" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="rtl:direction-rtl">
-                      {Object.keys(jordanCities).map((city) => (
-                        <SelectItem
-                          key={city}
-                          value={city}
-                          className="capitalize"
-                        >
-                          {city}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormDescription>إختار المدينة المناسبة</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )}
+          {/* ADDRESS */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:col-span-2">
+            {/* ADDRESS - CITY */}
+            {!id && (
+              <FormField
+                control={form.control}
+                name="address[0]"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>المدينة</FormLabel>
+                    <Select
+                      onValueChange={(value) => handleCityChange(field, value)}
+                      defaultValue={field.value}
+                      value={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="my-2 capitalize rtl:direction-rtl">
+                          <SelectValue placeholder="إختار المدينة" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="rtl:direction-rtl">
+                        {Object.keys(jordanCities).map((city) => (
+                          <SelectItem
+                            key={city}
+                            value={city}
+                            className="capitalize"
+                          >
+                            {t(city)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>إختار المدينة المناسبة</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
-          {/* ADDRESS - NEIGHBORHOOD */}
-          {!id && (
-            <FormField
-              control={form.control}
-              name="address[1]"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>المنطقة</FormLabel>
-                  <Select
-                    onValueChange={(value) => {
-                      field.onChange(
-                        currentNeighborhoods.find(
-                          (neighborhood) =>
-                            `${neighborhood.name}|${neighborhood.long}|${neighborhood.lat}` ===
-                            value,
-                        ),
-                      );
-                    }}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger
-                        className="my-2 capitalize rtl:direction-rtl"
-                        disabled={!currentCity}
-                      >
-                        <SelectValue placeholder="إختار المنطقة" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="rtl:direction-rtl">
-                      {currentNeighborhoods.map((neighborhood) => (
-                        <SelectItem
-                          key={`${neighborhood.name}|${neighborhood.long}|${neighborhood.lat}`}
-                          value={`${neighborhood.name}|${neighborhood.long}|${neighborhood.lat}`}
-                          className="capitalize"
+            {/* ADDRESS - NEIGHBORHOOD */}
+            {!id && (
+              <FormField
+                control={form.control}
+                name="address[1]"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>المنطقة</FormLabel>
+                    <Select
+                      onValueChange={(value) => {
+                        field.onChange(
+                          currentNeighborhoods.find(
+                            (neighborhood) =>
+                              `${neighborhood.name}|${neighborhood.long}|${neighborhood.lat}` ===
+                              value,
+                          ),
+                        );
+                      }}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger
+                          className="my-2 capitalize rtl:direction-rtl"
+                          disabled={!currentCity}
                         >
-                          {neighborhood.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormDescription>إختار المنطقة المناسبة</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )}
+                          <SelectValue placeholder="إختار المنطقة" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="rtl:direction-rtl">
+                        {currentNeighborhoods.map((neighborhood) => (
+                          <SelectItem
+                            key={`${neighborhood.name}|${neighborhood.long}|${neighborhood.lat}`}
+                            value={`${neighborhood.name}|${neighborhood.long}|${neighborhood.lat}`}
+                            className="capitalize"
+                          >
+                            {t(neighborhood.name)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>إختار المنطقة المناسبة</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+          </div>
 
           {/* STREET */}
           {!id && (
