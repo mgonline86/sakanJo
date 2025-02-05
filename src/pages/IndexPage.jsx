@@ -54,11 +54,13 @@ const IndexPage = () => {
       <Helmet>
         <title>{t('app_name')}</title>
       </Helmet>
-      <div className="grid grid-cols-1 justify-items-center px-4 py-32 md:grid-cols-2 md:gap-0 lg:grid-cols-3 lg:gap-2 xl:grid-cols-4 xl:gap-10">
+      <div
+        className={`grid grid-cols-1 justify-items-center px-4 py-32 md:grid-cols-2 md:gap-0 ${places.length > 0 ? 'lg:grid-cols-3' : 'lg:grid-cols-1'} lg:gap-2 xl:grid-cols-4 xl:gap-10`}
+      >
         {places.length > 0 ? (
           places.map((place) => <PlaceCard place={place} key={place.id} />)
         ) : (
-          <div className="absolute left-1/2 right-1/2 top-40 flex  w-full -translate-x-1/2 transform flex-col p-10  md:w-1/2">
+          <div className="mx-auto p-10">
             <h1 className="text-3xl font-semibold">Result not found!</h1>
             <p className="text-lg font-semibold">
               Sorry, we couldn&#39;t find the place you&#39;re looking for.

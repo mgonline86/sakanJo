@@ -13,13 +13,13 @@ import NotFoundPage from './pages/NotFoundPage';
 import PlacePage from './pages/PlacePage';
 import PlacesFormPage from './pages/PlacesFormPage';
 import PlacesPage from './pages/PlacesPage';
+import PlacesUpdateFormPage from './pages/PlacesUpdateFormPage';
 import PrivacyPolicy from './pages/Policy';
 import ProfilePage from './pages/ProfilePage';
 import RegisterPage from './pages/RegisterPage';
 import SingleBookedPlace from './pages/SingleBookedPlace';
 import { PlaceProvider } from './providers/PlaceProvider';
 import { UserProvider } from './providers/UserProvider';
-import PlacesUpdateFormPage from './pages/PlacesUpdateFormPage';
 
 function App() {
   return (
@@ -36,7 +36,10 @@ function App() {
             <Route path="/account" element={<ProfilePage />} />
             <Route path="/account/places" element={<PlacesPage />} />
             <Route path="/account/places/new" element={<PlacesFormPage />} />
-            <Route path="/account/places/:id" element={<PlacesUpdateFormPage />} />
+            <Route
+              path="/account/places/:id"
+              element={<PlacesUpdateFormPage />}
+            />
             <Route path="/place/:id" element={<PlacePage />} />
             <Route path="/account/bookings" element={<BookingsPage />} />
             <Route
