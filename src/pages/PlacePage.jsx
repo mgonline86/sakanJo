@@ -1,3 +1,4 @@
+import AddReviewForm from '@/components/AddReviewForm';
 import ImagesGallery from '@/components/ImagesGallery';
 import ReviewStars from '@/components/ReviewStars';
 import ReviewsCardsSection from '@/components/ReviewsCardsSection';
@@ -23,11 +24,13 @@ import { arSA, enUS } from 'date-fns/locale';
 import { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import { useAuth } from '../../hooks';
 import NotFoundPage from './NotFoundPage';
 
 export default function PlacePageNew() {
   const { id } = useParams();
+  const { user } = useAuth();
   const [place, setPlace] = useState(null);
   const [loading, setLoading] = useState(true);
   const { t, i18n } = useTranslation();
@@ -81,6 +84,14 @@ export default function PlacePageNew() {
     return `/assets/publisherUsers/${owner_picture}.png`;
   }, [place]);
 
+  const userHasReviewed = useMemo(() => {
+    if (!user) {
+      return false;
+    }
+
+    return reviews?.reviews?.some((review) => review.user_id === user.id);
+  }, [user, reviews]);
+
   if (loading) {
     return <Spinner />;
   }
@@ -91,11 +102,16 @@ export default function PlacePageNew() {
 
   const photos = place.photos?.split(',');
 
-  const { bathroom, kitchen, rooms, stages } = JSON.parse(
-    JSON.parse(place.number_of_rooms),
-  ) || {};
+  const { bathroom, kitchen, rooms, stages } =
+    JSON.parse(JSON.parse(place.number_of_rooms)) || {};
 
   const amenities = JSON.parse(JSON.parse(place.amenities));
+
+  const onReviewAdded = (data) =>
+    setReviews((prev) => ({
+      ...prev,
+      reviews: [...prev.reviews, data.review],
+    }));
 
   return (
     <div className="container mt-20 px-5 md:mt-28">
@@ -288,7 +304,9 @@ export default function PlacePageNew() {
                     </Button>
                   )}
 
-                  <ShareButton shareLink={`https://place.sakanijo.com/place?id=${id}`} />
+                  <ShareButton
+                    shareLink={`https://place.sakanijo.com/place?id=${id}`}
+                  />
                 </div>
               )}
             </div>
@@ -309,7 +327,7 @@ export default function PlacePageNew() {
               </div>
             </>
           )}
-          
+
           <hr />
 
           <div className="my-2">
@@ -334,6 +352,24 @@ export default function PlacePageNew() {
         />
       </div>
       {reviews?.reviews && <ReviewsCardsSection reviews={reviews.reviews} />}
+
+      {user ? (
+        <>
+          {!userHasReviewed && (
+            <div className="flex flex-col">
+              <h2 className="mb-1 text-2xl font-semibold">{t('add_review')}</h2>
+              <AddReviewForm place_id={id} onSuccess={onReviewAdded} />
+            </div>
+          )}
+        </>
+      ) : (
+        <div className="flex flex-col gap-4">
+          <h2 className="text-2xl font-semibold">{t('login_to_review')}</h2>
+          <Button asChild className="w-full max-w-sm">
+            <Link to="/login">{t('login')}</Link>
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

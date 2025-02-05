@@ -264,5 +264,9 @@
 
   "للبيع": "Purchase",
   "للإيجار": "Rent",
-  "الحجز": "Booking"
+  "الحجز": "Booking",
+   
+  "login_to_review": "Login to add review",
+  "add_review": "Add Review",
+  "submit_review": "Submit Review"
 }
