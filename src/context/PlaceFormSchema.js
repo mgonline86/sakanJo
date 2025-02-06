@@ -166,6 +166,8 @@ const sellingTypeSchema = z.discriminatedUnion('buyOrRent', [
 
   z.object({
     // hajz only
+    priceBeforeNoon: z.number().min(1).or(z.literal('')),
+    priceAfterNoon: z.number().min(1).or(z.literal('')),
     buyOrRent: z.literal('الحجز'),
     hajezDays: z.array(z.enum(weekDays)).min(1),
     hajezType: z.enum(hajezHours),
@@ -220,12 +222,12 @@ export const placeFormSchema = (t) =>
       priceHide: z.boolean(),
 
       existingPhotos: z.string().nullish(),
-      images: z.array(z.instanceof(File)).min(1, {
-        message: t('new_ad.images.error'),
-      }).max(10),
-
-      priceBeforeNoon: z.number().min(1).or(z.literal("")),
-      priceAfterNoon: z.number().min(1).or(z.literal("")),
+      images: z
+        .array(z.instanceof(File))
+        .min(1, {
+          message: t('new_ad.images.error'),
+        })
+        .max(10),
 
       folderName: z.string().nullish(),
     })
