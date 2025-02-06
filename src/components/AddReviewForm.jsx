@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Star, StarBorder } from '@mui/icons-material';
 import axios from 'axios';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
@@ -47,8 +47,6 @@ export default function AddReviewForm({ place_id, onSuccess }) {
   const form = useForm({
     resolver: zodResolver(addReviewFormSchema),
     defaultValues: {
-      place_id: place_id,
-      user_id: user?.id,
       comment: '',
       rating: 0,
     },
@@ -58,6 +56,12 @@ export default function AddReviewForm({ place_id, onSuccess }) {
     isHoveringStar: false,
     rating: 0,
   });
+
+  useEffect(() => {
+    form.reset();
+    form.setValue('place_id', place_id);
+    form.setValue('user_id', user.id);
+  }, [form, place_id, user]);
 
   const onSubmit = async (data) => {
     try {
@@ -114,13 +118,6 @@ export default function AddReviewForm({ place_id, onSuccess }) {
                       setIsHoveringStar({ isHoveringStar: false, rating: 0 })
                     }
                   >
-                    {/* {(isHoveringStar.isHoveringStar &&
-                      isHoveringStar.rating >= rating) ||
-                    field.value >= rating ? (
-                      <Star className="h-4 w-4 md:h-6 md:w-6" />
-                    ) : (
-                      <StarBorder className="h-4 w-4 md:h-6 md:w-6" />
-                    )} */}
                     {isHoveringStar.isHoveringStar ? (
                       isHoveringStar.rating >= rating ? (
                         <Star className="h-4 w-4 md:h-6 md:w-6" />
@@ -138,7 +135,13 @@ export default function AddReviewForm({ place_id, onSuccess }) {
               <FormControl>
                 <Input type="hidden" {...field} />
               </FormControl>
-              <span>({field.value.toFixed(0)})</span>
+              <span>
+                (
+                {isHoveringStar.isHoveringStar
+                  ? isHoveringStar.rating
+                  : field.value}
+                )
+              </span>
               <FormMessage />
             </FormItem>
           )}
