@@ -72,5 +72,5 @@ button.social {
 }
 
 .card {
-  @apply h-[410px] w-[327px] sm:h-[500px] sm:w-[435px] md:h-[400px] md:w-[350px] lg:h-[400px] lg:w-[330px] xl:h-[350px] xl:w-[300px];
+  @apply h-[410px] sm:h-[500px] md:h-[400px] lg:h-[400px] xl:h-[350px];
 }

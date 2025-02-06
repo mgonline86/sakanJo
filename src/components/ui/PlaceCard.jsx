@@ -8,10 +8,10 @@ const PlaceCard = ({ place }) => {
   const { t } = useTranslation();
 
   return (
-    <a href={`/place/${id}`} className="my-4 flex flex-col md:m-2 xl:m-0">
-      <div className="card relative mx-auto max-w-[90%] rounded-md shadow transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg md:max-w-full">
+    <a href={`/place/${id}`} className="my-4 flex flex-col md:m-2 xl:m-0 w-full max-w-sm sm:max-w-[18rem]">
+      <div className="card relative mx-auto w-full rounded-md shadow transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg">
         {photos?.[0] && (
-          <div className="relative h-[70%] w-full rounded-xl">
+          <div className="relative h-[70%] rounded-xl">
             <img
               src={`https://backend.sakanijo.com/api/images/${encodeURIComponent(place.folderName)}/${encodeURIComponent(photos[0])}`}
               className="h-full w-full rounded-xl object-cover"
