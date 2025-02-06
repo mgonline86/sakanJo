@@ -41,13 +41,13 @@ const PlaceCard = ({ place }) => {
         )}
         <div className="p-2">
           <h2 className="truncate font-bold" style={{ textAlign: 'right' }}>
-            {address}
+            {title}
           </h2>
           <h3
             className="truncate text-sm text-gray-500"
             style={{ textAlign: 'right' }}
           >
-            {title}
+            {address}
           </h3>
           <div className="mt-1" style={{ textAlign: 'right' }}>
             <span className="font-semibold">{price} JOD </span>
