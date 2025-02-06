@@ -897,7 +897,13 @@ export default function PlaceForm({ id }) {
                       {...field}
                       type="number"
                       min={1}
-                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      onChange={(e) => {
+                        if (e.target.value === '') {
+                          form.resetField('spaceGeneral');
+                        } else {
+                          return field.onChange(Number(e.target.value));
+                        }
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
@@ -986,7 +992,13 @@ export default function PlaceForm({ id }) {
                     type="number"
                     min={1}
                     step={0.1}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
+                    onChange={(e) => {
+                      if (e.target.value === '') {
+                        form.resetField('price');
+                      } else {
+                        return field.onChange(Number(e.target.value));
+                      }
+                    }}
                   />
                 </FormControl>
                 <FormMessage />
@@ -1074,9 +1086,13 @@ export default function PlaceForm({ id }) {
                           type="number"
                           min={1}
                           step={0.1}
-                          onChange={(e) =>
-                            field.onChange(Number(e.target.value))
-                          }
+                          onChange={(e) => {
+                            if (e.target.value === '') {
+                              form.resetField('priceBeforeNoon');
+                            } else {
+                              return field.onChange(Number(e.target.value));
+                            }
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
@@ -1095,9 +1111,13 @@ export default function PlaceForm({ id }) {
                           type="number"
                           min={1}
                           step={0.1}
-                          onChange={(e) =>
-                            field.onChange(Number(e.target.value))
-                          }
+                          onChange={(e) => {
+                            if (e.target.value === '') {
+                              form.resetField('priceAfterNoon');
+                            } else {
+                              return field.onChange(Number(e.target.value));
+                            }
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
@@ -1219,9 +1239,17 @@ export default function PlaceForm({ id }) {
                                 <FormControl>
                                   <Input
                                     {...field}
-                                    onChange={(e) =>
-                                      field.onChange(Number(e.target.value))
-                                    }
+                                    onChange={(e) => {
+                                      if (e.target.value === '') {
+                                        form.resetField(
+                                          `variablePrices.${day}`,
+                                        );
+                                      } else {
+                                        return field.onChange(
+                                          Number(e.target.value),
+                                        );
+                                      }
+                                    }}
                                     type="number"
                                     min={1}
                                     step={0.1}
@@ -1544,7 +1572,13 @@ export default function PlaceForm({ id }) {
                         {...field}
                         type="number"
                         min={0}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        onChange={(e) => {
+                          if (e.target.value === '') {
+                            form.resetField('numberOfStreetsInLand');
+                          } else {
+                            return field.onChange(Number(e.target.value));
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -1568,7 +1602,13 @@ export default function PlaceForm({ id }) {
                         {...field}
                         type="number"
                         min={0}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        onChange={(e) => {
+                          if (e.target.value === '') {
+                            form.resetField('numberOfRooms.rooms');
+                          } else {
+                            return field.onChange(Number(e.target.value));
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -1586,7 +1626,13 @@ export default function PlaceForm({ id }) {
                         {...field}
                         type="number"
                         min={0}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        onChange={(e) => {
+                          if (e.target.value === '') {
+                            form.resetField('numberOfRooms.kitchen');
+                          } else {
+                            return field.onChange(Number(e.target.value));
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -1604,7 +1650,13 @@ export default function PlaceForm({ id }) {
                         {...field}
                         type="number"
                         min={0}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        onChange={(e) => {
+                          if (e.target.value === '') {
+                            form.resetField('numberOfRooms.bathroom');
+                          } else {
+                            return field.onChange(Number(e.target.value));
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -1623,9 +1675,13 @@ export default function PlaceForm({ id }) {
                           {...field}
                           type="number"
                           min={0}
-                          onChange={(e) =>
-                            field.onChange(Number(e.target.value))
-                          }
+                          onChange={(e) => {
+                            if (e.target.value === '') {
+                              form.resetField('numberOfRooms.stages');
+                            } else {
+                              return field.onChange(Number(e.target.value));
+                            }
+                          }}
                         />
                       </FormControl>
                       <FormMessage />
@@ -1650,7 +1706,13 @@ export default function PlaceForm({ id }) {
                         {...field}
                         type="number"
                         min={0}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        onChange={(e) => {
+                          if (e.target.value === '') {
+                            form.resetField('numberOfHomeStage');
+                          } else {
+                            return field.onChange(Number(e.target.value));
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -1668,7 +1730,13 @@ export default function PlaceForm({ id }) {
                         {...field}
                         type="number"
                         min={0}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        onChange={(e) => {
+                          if (e.target.value === '') {
+                            form.resetField('totalStages');
+                          } else {
+                            return field.onChange(Number(e.target.value));
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -1840,7 +1908,13 @@ export default function PlaceForm({ id }) {
                         {...field}
                         type="number"
                         min={2}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        onChange={(e) => {
+                          if (e.target.value === '') {
+                            form.resetField('countPeople');
+                          } else {
+                            return field.onChange(Number(e.target.value));
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
