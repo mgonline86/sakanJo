@@ -71,7 +71,7 @@ export const usePlaceForm = (t, place = null, photos = [], poolDocument = '', ch
       gettingCalls: place?.gettingCalls || 'whatsapp', // الاعلان يستقبل رسايل عبر (whatsapp/sms)
       // ownerStatus: '', // حالة المعلن (وسيط/مالك) --> old api cancelled
       publisherState: place?.publisher_state || 'مالك', // هون متا الاولى حالة المعلن وسيط او مالك
-      price: place?.price ? Number(place?.price) : 1, // general price
+      price: place?.price ? Number(place?.price) : "", // general price
 
       // depend on homeType
       amenities:
@@ -83,9 +83,9 @@ export const usePlaceForm = (t, place = null, photos = [], poolDocument = '', ch
       // location: '',
       street: place?.street || '', // string الحي
       closePlace: place?.closePlace || '', // string ??! مكان قريب
-      longitude: place?.longitude ? Number(place?.longitude) : 0, // احداتيات المنطقة في الخريطة of place
-      latitude: place?.latitude ? Number(place?.latitude) : 0, // احداتيات المنطقة في الخريطة of place
-      spaceGeneral: place?.space_general ? Number(place?.space_general) : 1, // مساحة العقار(رقم)
+      longitude: place?.longitude ? Number(place?.longitude) : "", // احداتيات المنطقة في الخريطة of place
+      latitude: place?.latitude ? Number(place?.latitude) : "", // احداتيات المنطقة في الخريطة of place
+      spaceGeneral: place?.space_general ? Number(place?.space_general) : "", // مساحة العقار(رقم)
 
       // pricing info
       priceHide: place?.priceHide || false, // priceHide, اخفاء السعر (true/false)
@@ -149,7 +149,7 @@ export const usePlaceForm = (t, place = null, photos = [], poolDocument = '', ch
 
       // if land
       landInFaceOfStreet: place?.landInFaceOfStreet || 'لا', // هل الارض امامها شارع (نعم/لا)
-      numberOfStreetsInLand: place?.numberOfStreetsInLand || 0, // عدد الشوارع امام الارض (رقم)
+      numberOfStreetsInLand: place?.numberOfStreetsInLand ? Number(place?.numberOfStreetsInLand) : 0, // عدد الشوارع امام الارض (رقم)
 
       // if apartment or house/villa
       numberOfRooms:
@@ -157,17 +157,17 @@ export const usePlaceForm = (t, place = null, photos = [], poolDocument = '', ch
           ? JSON.parse(JSON.parse(place?.number_of_rooms))
           : {
               // عدد الغرف لازم تكون زي هيك
-              kitchen: 1,
-              rooms: 1,
-              bathroom: 1,
-              stages: 1, // if villa or house
+              kitchen: "",
+              rooms: "",
+              bathroom: "",
+              stages: "", // if villa or house
             },
 
       // if apartment
       numberOfHomeStage: place?.numberOfHomeStage
         ? Number(place?.numberOfHomeStage)
-        : 1, // الشقة في الطابق رقم (رقم)
-      totalStages: place?.totalStages ? Number(place?.totalStages) : 1, // عدد الطوابق في البيت (رقم)
+        : "", // الشقة في الطابق رقم (رقم)
+      totalStages: place?.totalStages ? Number(place?.totalStages) : "", // عدد الطوابق في البيت (رقم)
 
       // if trip
       tripLong: place?.tripLong || '', // مدة الرحلة(15days / 1month )
@@ -178,7 +178,7 @@ export const usePlaceForm = (t, place = null, photos = [], poolDocument = '', ch
 
       // if meeting room
       meetingRoomType: place?.meetingRoomType || '', // نوع غرفة الاجتماعات اختياري بين الانواع التالية :[  "غرفة على شكل U","مسرح","قاعة درس","مكان للعمل الجماعي","بيانات"]
-      countPeople: place?.countPeople ? Number(place?.countPeople) : 3, // عدد الاشخاص المسموح بيهم في غرفة الاجتماعات (رقم)
+      countPeople: place?.countPeople ? Number(place?.countPeople) : "", // عدد الاشخاص المسموح بيهم في غرفة الاجتماعات (رقم)
 
       // if gym
       subscriptionTypeGym: place?.subscriptionTypeGym || 'شهر', // نوع الاشتراك في الصالة الرياضية: [شهر, تلاتة اشهر,سنة
