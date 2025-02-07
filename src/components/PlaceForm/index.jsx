@@ -56,7 +56,7 @@ import {
   Warehouse,
 } from '@mui/icons-material';
 import axios from 'axios';
-import { format } from 'date-fns';
+import { addDays, format } from 'date-fns';
 import { serialize } from 'object-to-formdata';
 import { useEffect, useMemo, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -112,7 +112,12 @@ const updateAllowedKeys = [
   'calanderDaysPrice',
 ];
 
-const dayHoursHomeTypes = ['مسابح', 'قاعات اجتماعات', 'صالات رياضة', 'ملاعب'];
+export const dayHoursHomeTypes = [
+  'مسابح',
+  'قاعات اجتماعات',
+  'صالات رياضة',
+  'ملاعب',
+];
 
 const homeTypeIcons = {
   'فيلا / منزل': <Home className="h-5 w-5 sm:h-10 sm:w-10" />,
@@ -175,7 +180,7 @@ const monoBuyingTypes = {
   'صالات رياضة': 'الحجز',
 };
 
-const hajezVariesNegelectedTypes = [
+export const hajezVariesNegelectedTypes = [
   'مسابح',
   'صالات رياضة',
   'قاعات اجتماعات',
@@ -432,6 +437,8 @@ export default function PlaceForm({ id }) {
   if (!user) {
     return null;
   }
+
+  const tomorrow = addDays(new Date(), 1);
 
   return (
     <Form {...form}>
@@ -1775,7 +1782,7 @@ export default function PlaceForm({ id }) {
                                 />
                               </FormControl>
                               <FormLabel className="font-normal">
-                                {period}
+                                {t(period)}
                               </FormLabel>
                             </FormItem>
                           ))}
@@ -1819,9 +1826,7 @@ export default function PlaceForm({ id }) {
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
-                          disabled={(date) =>
-                            date > new Date() || date < new Date('1900-01-01')
-                          }
+                          disabled={{ before: tomorrow }}
                           initialFocus
                         />
                       </PopoverContent>

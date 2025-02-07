@@ -265,8 +265,17 @@
   "للبيع": "Purchase",
   "للإيجار": "Rent",
   "الحجز": "Booking",
+
+  "15days": "15 days",
+  "1month": "1 month",
    
   "login_to_review": "Login to add review",
   "add_review": "Add Review",
-  "submit_review": "Submit Review"
+  "submit_review": "Submit Review",
+
+  "not_found":{
+    "title": "We can't seem to find the page you're looking for.",
+    "sub_title": "Sorry, the page you are looking for doesn't exist or has been moved.",
+    "btn_text": "Home"
+  }
 }

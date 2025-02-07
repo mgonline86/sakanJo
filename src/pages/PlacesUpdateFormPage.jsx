@@ -1,20 +1,20 @@
+import DeletePlaceAlertDialog from '@/components/DeletePlaceAlertDialog';
 import PlaceForm from '@/components/PlaceForm';
+import TogglePlaceActivity from '@/components/TogglePlaceActivity';
 import AccountNav from '@/components/ui/AccountNav';
+import Spinner from '@/components/ui/Spinner';
 import { Button } from '@/components/ui/button';
 import {
+  PlaceFormProvider,
   getDocument,
   getPlacePhotos,
-  PlaceFormProvider,
 } from '@/context/PlaceFormContext';
+import { ArrowBack } from '@mui/icons-material';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../hooks';
-import { ArrowBack } from '@mui/icons-material';
-import Spinner from '@/components/ui/Spinner';
-import TogglePlaceActivity from '@/components/TogglePlaceActivity';
-import DeletePlaceAlertDialog from '@/components/DeletePlaceAlertDialog';
 import NotFoundPage from './NotFoundPage';
 
 export default function PlacesUpdateFormPage() {
@@ -42,20 +42,23 @@ export default function PlacesUpdateFormPage() {
         const response = await axios.get(
           `https://backend.sakanijo.com/api/places/${id}`,
         );
-        setPlace(response.data);
+        setPlace(response?.data);
         setPhotos(
-          await getPlacePhotos(response.data.photos, response.data.folderName),
+          await getPlacePhotos(
+            response?.data?.photos,
+            response?.data?.folderName,
+          ),
         );
         setPoolDocument(
           await getDocument(
-            response.data.poolDocument,
-            response.data.folderName,
+            response?.data?.poolDocument,
+            response?.data?.folderName,
           ),
         );
         setChaletDocument(
           await getDocument(
-            response.data.chaletDocument,
-            response.data.folderName,
+            response?.data?.challetDocument,
+            response?.data?.folderName,
           ),
         );
       } catch (error) {
