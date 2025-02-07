@@ -232,4 +232,16 @@ export const placeFormSchema = (t) =>
       folderName: z.string().nullish(),
     })
     .and(sellingTypeSchema)
-    .and(homeTypeSchema);
+    .and(homeTypeSchema)
+    .refine(
+      (data) => {
+        if (data.homeType === 'شقة') {
+          return data.numberOfHomeStage <= data.totalStages;
+        }
+        return true;
+      },
+      {
+        message: 'رقم الطابق يجب ان يكون اقل من او يساوي رقم الطوابق',
+        path: ['numberOfHomeStage'],
+      },
+    );
