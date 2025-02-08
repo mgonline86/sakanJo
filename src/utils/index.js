@@ -10,14 +10,14 @@ export const setItemsInLocalStorage = (key, value) => {
 
 export const getItemFromLocalStorage = (key) => {
   if (!key) {
-    return console.error(`Cannot get value from LS`);
+    return console.error('Cannot get value from LS');
   }
   return localStorage.getItem(key);
 };
 
 export const removeItemFromLocalStorage = (key) => {
   if (!key) {
-    return console.error(`Cannot remove item from LS`);
+    return console.error('Cannot remove item from LS');
   }
   localStorage.removeItem(key);
 };
@@ -62,3 +62,63 @@ export const pdfUrlToFile = (url, fileName = 'document.pdf') =>
     const fileData = dataURLtoFile(dataUrl, fileName);
     return fileData;
   });
+
+export const handleYassinArray = (data) => {
+  if (!data) {
+    return [];
+  }
+
+  let arr = [];
+  try {
+    // check if already array
+    if (Array.isArray(data)) {
+      return data;
+    }
+
+    // 1st try
+    arr = JSON.parse(data);
+    if (Array.isArray(arr)) {
+      return arr;
+    }
+
+    // 2nd try
+    arr = JSON.parse(arr);
+    if (Array.isArray(arr)) {
+      return arr;
+    }
+
+    return [];
+  } catch {
+    return [];
+  }
+};
+
+export const handleYassinObject = (data, returnEntriesArray = false) => {
+  if (!data) {
+    return returnEntriesArray ? [] : {};
+  }
+  
+  let obj = {};
+  try {
+    // check if already object
+    if (typeof data === 'object' && !Array.isArray(data)) {
+      return returnEntriesArray ? Object.entries(data) : data;
+    }
+
+    // 1st try
+    obj = JSON.parse(data);
+    if (typeof obj === 'object') {
+      return returnEntriesArray ? Object.entries(obj) : obj;
+    }
+
+    // 2nd try
+    obj = JSON.parse(obj);
+    if (typeof obj === 'object') {
+      return returnEntriesArray ? Object.entries(obj) : obj;
+    }
+
+    return returnEntriesArray ? [] : {};
+  } catch {
+    return returnEntriesArray ? [] : {};
+  }
+};
