@@ -17,6 +17,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
+import { handleYassinArray, handleYassinObject } from '@/utils';
 import {
   AccountCircle,
   ArrowDropDownCircle,
@@ -31,7 +32,7 @@ import {
 import axios from 'axios';
 import { format, formatDistance } from 'date-fns';
 import { arSA, enUS } from 'date-fns/locale';
-import { Fragment, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
@@ -102,6 +103,18 @@ export default function PlacePageNew() {
     return reviews?.reviews?.some((review) => review.user_id === user.id);
   }, [user, reviews]);
 
+  const getHajezDays = useMemo(() => {
+    return handleYassinArray(place?.hajez_days);
+  }, [place]);
+
+  const getHajezDaysPrices = useMemo(() => {
+    return handleYassinObject(place?.variable_prices, true);
+  }, [place]);
+
+  const getCalanderDaysPrice = useMemo(() => {
+    return handleYassinObject(place?.calanderDaysPrice, true);
+  }, [place]);
+
   if (loading) {
     return <Spinner />;
   }
@@ -136,33 +149,6 @@ export default function PlacePageNew() {
     }
     return [null, null];
   })();
-
-  const getHajezDays = (daysJSONString) => {
-    try {
-      const days = JSON.parse(JSON.parse(daysJSONString));
-      return days;
-    } catch {
-      return [];
-    }
-  };
-
-  const getHajezDaysPrices = (variable_prices) => {
-    try {
-      const daysPrices = JSON.parse(JSON.parse(variable_prices));
-      return Object.entries(daysPrices);
-    } catch {
-      return [];
-    }
-  };
-
-  const getCalanderDaysPrice = (calanderDaysPrice) => {
-    try {
-      const daysPrices = JSON.parse(calanderDaysPrice);
-      return Object.entries(daysPrices);
-    } catch {
-      return [];
-    }
-  };
 
   const onReviewAdded = (data) =>
     setReviews((prev) => ({
@@ -288,12 +274,17 @@ export default function PlacePageNew() {
             </div>
           )}
 
-          {/* SPACE GENERAL */}
-          {place?.space_general && (
-            <div className="my-2">
-              {place?.space_general} m<sup>2</sup>
-            </div>
-          )}
+          <div className="my-2 flex flex-wrap items-center gap-3">
+            <span className="rounded bg-gray-200 px-2 py-1 text-sm">
+              {place?.home_type}
+            </span>
+            {/* SPACE GENERAL */}
+            {place?.space_general && (
+              <span className="rtl:direction-ltr">
+                ({place?.space_general} m<sup>2</sup>)
+              </span>
+            )}
+          </div>
 
           {/* PRICE & REACTIONS */}
           <div className="my-2 flex flex-wrap items-center gap-3 text-xs">
@@ -412,7 +403,7 @@ export default function PlacePageNew() {
           </div>
 
           {/* AMENITIES */}
-          {amenities.length > 0 && (
+          {amenities?.length > 0 && (
             <>
               <hr />
               <div className="my-4 flex flex-wrap gap-2">
@@ -489,13 +480,13 @@ export default function PlacePageNew() {
                 )}
                 {!hajezVariesNegelectedTypes.includes(place?.home_type) && (
                   <>
-                    {place?.hajez_days?.length > 2 && (
+                    {getHajezDays.length > 0 && (
                       <>
                         <hr className="w-full" />
                         <div className="flex flex-col gap-2">
                           <h3>الأيام المتاحة للحجز</h3>
                           <div className="my-4 flex flex-wrap gap-2">
-                            {getHajezDays(place.hajez_days).map((day) => (
+                            {getHajezDays.map((day) => (
                               <div
                                 key={day}
                                 className="rounded-sm border px-2 py-1 text-xs font-bold md:rounded-lg md:px-4 md:py-2 md:text-sm"
@@ -507,37 +498,35 @@ export default function PlacePageNew() {
                         </div>
                       </>
                     )}
-                    {place?.variable_prices?.length > 2 && (
+                    {getHajezDaysPrices?.length > 0 && (
                       <>
                         <hr className="w-full" />
                         <div className="flex flex-col gap-2">
                           <h3>أسعار أيام الحجز</h3>
                           <div className="flex flex-wrap gap-2">
-                            {getHajezDaysPrices(place.variable_prices).map(
-                              (dayPrice) => {
-                                if (!dayPrice[0] || !dayPrice[1]) return null;
-                                return (
-                                  <div
-                                    key={dayPrice[0]}
-                                    className="rounded-sm border px-2 py-1 text-xs md:rounded-lg md:px-4 md:py-2 md:text-sm"
-                                  >
-                                    {dayPrice[1] && (
-                                      <>
-                                        <span className="font-bold">
-                                          {dayPrice[0]}
-                                        </span>
-                                        : {dayPrice[1]} JOD
-                                      </>
-                                    )}
-                                  </div>
-                                );
-                              },
-                            )}
+                            {getHajezDaysPrices.map((dayPrice) => {
+                              if (!dayPrice[0] || !dayPrice[1]) return null;
+                              return (
+                                <div
+                                  key={dayPrice[0]}
+                                  className="rounded-sm border px-2 py-1 text-xs md:rounded-lg md:px-4 md:py-2 md:text-sm"
+                                >
+                                  {dayPrice[1] && (
+                                    <>
+                                      <span className="font-bold">
+                                        {dayPrice[0]}
+                                      </span>
+                                      : {dayPrice[1]} JOD
+                                    </>
+                                  )}
+                                </div>
+                              );
+                            })}
                           </div>
                         </div>
                       </>
                     )}
-                    {place?.calanderDaysPrice?.length > 2 && (
+                    {getCalanderDaysPrice.length > 0 && (
                       <>
                         <hr className="w-full" />
                         <Collapsible className="rounded-lg border p-2">
@@ -546,20 +535,13 @@ export default function PlacePageNew() {
                               variant="link"
                               className="flex h-4 items-center gap-1 bg-transparent p-0"
                             >
-                              أسعار أيام معينة(
-                              {
-                                getCalanderDaysPrice(place.calanderDaysPrice)
-                                  .length
-                              }
-                              )
+                              أسعار أيام معينة ({getCalanderDaysPrice?.length})
                               <ArrowDropDownCircle className="h-4 w-4" />
                             </Button>
                           </CollapsibleTrigger>
                           <CollapsibleContent>
                             <div className="my-2 flex flex-wrap gap-2 text-xs md:text-sm">
-                              {getCalanderDaysPrice(
-                                place.calanderDaysPrice,
-                              ).map((dayPrice) => {
+                              {getCalanderDaysPrice.map((dayPrice) => {
                                 if (!dayPrice[0] || !dayPrice[1]) return null;
                                 return (
                                   <div
@@ -592,7 +574,7 @@ export default function PlacePageNew() {
 
           {/* DayHours HomeTypes */}
           {dayHoursHomeTypes.includes(place?.home_type) &&
-            place?.timeOpen.length > 2 && (
+            place?.timeOpen?.length > 2 && (
               <>
                 {(timeStart || timeEnd) && <hr />}
                 <div className="flex flex-wrap gap-2">
@@ -621,28 +603,30 @@ export default function PlacePageNew() {
             )}
 
           {/* POOL & GYM */}
-          {['مسابح', 'صالات رياضة'].includes(place?.home_type) && (
-            <>
-              <hr />
-              <div className="my-4 flex flex-wrap gap-2">
-                {place?.poolType && (
-                  <div className="flex min-w-fit flex-1 flex-col gap-1">
-                    <span className="text-sm text-muted-foreground">
-                      نوع المكان
-                    </span>
-                    <span className="max-w-fit rounded-sm bg-gray-100 px-2 py-1">
-                      {place.poolType}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </>
-          )}
+          {['مسابح', 'صالات رياضة'].includes(place?.home_type) &&
+            place?.poolType && (
+              <>
+                <hr />
+                <div className="my-4 flex flex-wrap gap-2">
+                  {place?.poolType && (
+                    <div className="flex min-w-fit flex-1 flex-col gap-1">
+                      <span className="text-sm text-muted-foreground">
+                        نوع المكان
+                      </span>
+                      <span className="max-w-fit rounded-sm bg-gray-100 px-2 py-1">
+                        {place.poolType}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
 
           {/* POOL */}
           {place?.home_type === 'مسابح' && (
             <>
-              <hr />
+              {(place?.deepPool ||
+                (place?.poolDocument && place?.folderName)) && <hr />}
               <div className="my-4 flex flex-wrap gap-2">
                 {place?.deepPool && (
                   <div className="flex min-w-fit flex-1 flex-col gap-1">
