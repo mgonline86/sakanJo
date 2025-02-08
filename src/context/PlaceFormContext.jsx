@@ -3,8 +3,12 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { placeFormSchema, weekDays } from './PlaceFormSchema';
 import { jordanCities } from '@/data/jordanCities';
-import { imageUrlToFile, pdfUrlToFile } from '@/utils';
-
+import {
+  handleYassinArray,
+  handleYassinObject,
+  imageUrlToFile,
+  pdfUrlToFile,
+} from '@/utils';
 
 export const getPlacePhotos = async (photos, folderName) => {
   if (!photos || !folderName) return [];
@@ -54,8 +58,24 @@ const getAddressParent = (address) => {
   return ['', ''];
 };
 
-export const usePlaceForm = (t, place = null, photos = [], poolDocument = '', chaletDocument = '') =>
-  useForm({
+export const usePlaceForm = (
+  t,
+  place = null,
+  photos = [],
+  poolDocument = '',
+  chaletDocument = '',
+) => {
+  const oldAmenities = handleYassinArray(place?.amenities);
+  const oldHajezDays = handleYassinArray(place?.hajez_days);
+  const oldVariablePrices = handleYassinObject(place?.variable_prices);
+  const oldSpecificDaysInCalendar = handleYassinArray(
+    place?.specificDaysInCalendar,
+  );
+  const oldCalanderDaysPrice = handleYassinObject(place?.calanderDaysPrice);
+  const oldTimeOpen = handleYassinObject(place?.timeOpen);
+  const oldNumberOfRooms = handleYassinObject(place?.number_of_rooms);
+
+  return useForm({
     resolver: zodResolver(placeFormSchema(t)),
     defaultValues: {
       type: null, // --> old api cancelled
@@ -64,28 +84,25 @@ export const usePlaceForm = (t, place = null, photos = [], poolDocument = '', ch
       homeType: place?.home_type || 'فيلا / منزل', // نوع المنزل (شقة/شليه:/الخ)
       title: place?.title || '', // ??! NOT FOUND ??!
       description: place?.description || '', // ??! NOT FOUND ??!
-      existingPhotos: "",
+      existingPhotos: '',
       images: photos, // ??! NOT FOUND ??!
       buyOrRent: place?.buy_or_rent || 'للبيع', // نوع البيع (للبيع/الإيجار/الحجز)
       adsAccept: place?.ads_accept || 'لا', // هون ااعلان يستقبل (قابل لتفاوض/تقسيط/لا)
       gettingCalls: place?.gettingCalls || 'whatsapp', // الاعلان يستقبل رسايل عبر (whatsapp/sms)
       // ownerStatus: '', // حالة المعلن (وسيط/مالك) --> old api cancelled
       publisherState: place?.publisher_state || 'مالك', // هون متا الاولى حالة المعلن وسيط او مالك
-      price: place?.price ? Number(place?.price) : "", // general price
+      price: place?.price ? Number(place?.price) : '', // general price
 
       // depend on homeType
-      amenities:
-        place?.amenities?.length > 2
-          ? JSON.parse(JSON.parse(place?.amenities))
-          : [], // هون بتخزن array فيها مزايا العقار
+      amenities: oldAmenities, // هون بتخزن array فيها مزايا العقار
 
       address: place?.address ? getAddressParent(place?.address) : ['', ''], // بتخزن هنا عنوان المكان
       // location: '',
       street: place?.street || '', // string الحي
       closePlace: place?.closePlace || '', // string ??! مكان قريب
-      longitude: place?.longitude ? Number(place?.longitude) : "", // احداتيات المنطقة في الخريطة of place
-      latitude: place?.latitude ? Number(place?.latitude) : "", // احداتيات المنطقة في الخريطة of place
-      spaceGeneral: place?.space_general ? Number(place?.space_general) : "", // مساحة العقار(رقم)
+      longitude: place?.longitude ? Number(place?.longitude) : '', // احداتيات المنطقة في الخريطة of place
+      latitude: place?.latitude ? Number(place?.latitude) : '', // احداتيات المنطقة في الخريطة of place
+      spaceGeneral: place?.space_general ? Number(place?.space_general) : '', // مساحة العقار(رقم)
 
       // pricing info
       priceHide: place?.priceHide || false, // priceHide, اخفاء السعر (true/false)
@@ -94,26 +111,14 @@ export const usePlaceForm = (t, place = null, photos = [], poolDocument = '', ch
       rentType: place?.rentType || 'شهري', // نوع الاليجار (شهري/سنوي)
 
       // if hajez
-      hajezDays:
-        place?.hajez_days?.length > 2
-          ? JSON.parse(JSON.parse(place?.hajez_days))
-          : weekDays, // هون بتخزن array فيها ايام الاسبوع الي مسموح فيها الحجز متال ['الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت','الأحد',]
+      hajezDays: oldHajezDays.length > 0 ? oldHajezDays : weekDays, // هون بتخزن array فيها ايام الاسبوع الي مسموح فيها الحجز متال ['الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت','الأحد',]
       hajezType: place?.hajezType || '24ساعة', // نوع الحجز المسموح فيه (24ساعة/12ساعة)
-      variablePrices:
-        place?.variable_prices?.length > 2
-          ? JSON.parse(JSON.parse(place?.variable_prices))
-          : {}, // هون السعر متغير حسب الايام القيمة الولية هي {} اوبجيكت فارغ  بس ادا اختار العميل السعر متغير بتدخل سعر حسب الايام متال {الخميس:150، الاحد:200}
-      specificDaysInCalander:
-        place?.specificDaysInCalendar?.length > 2
-          ? JSON.parse(JSON.parse(place?.specificDaysInCalendar)).map(
-              (day) => new Date(day),
-            )
-          : [], // هون بتحط ايام معينة في السنة  داخل array
+      variablePrices: oldVariablePrices, // هون السعر متغير حسب الايام القيمة الولية هي {} اوبجيكت فارغ  بس ادا اختار العميل السعر متغير بتدخل سعر حسب الايام متال {الخميس:150، الاحد:200}
+      specificDaysInCalander: oldSpecificDaysInCalendar.map(
+        (day) => new Date(day),
+      ), // هون بتحط ايام معينة في السنة  داخل array
       // specificDaysCalanderPrice: [100, 200], // هون بتحط السعر لكل يوم من تلك الايام داخل array  القيمة الولية هي null  // I think not used
-      calanderDaysPrice:
-        place?.calanderDaysPrice?.length > 2
-          ? JSON.parse(place?.calanderDaysPrice)
-          : {}, // "{"2025-01-05":"12000","2025-01-04":"11000","2025-02-26":"14000","2025-02-13":"13000"}"
+      calanderDaysPrice: oldCalanderDaysPrice, // "{"2025-01-05":"12000","2025-01-04":"11000","2025-02-26":"14000","2025-02-13":"13000"}"
 
       // فقط المسابح والإجتامعات وصالات الرياضة والملاعب
       priceBeforeNoon: place?.priceBeforeNoon
@@ -124,8 +129,8 @@ export const usePlaceForm = (t, place = null, photos = [], poolDocument = '', ch
         : '', // سعر في المساء و بعد الضهيرة
       // هون ادا خلىً القيمة فارغة خلي في هادا السعر نفس قسمة السعر price gneral
       timeOpen:
-        place?.timeOpen?.length > 2
-          ? JSON.parse(place?.timeOpen)
+        Object.keys(oldTimeOpen).length > 0
+          ? oldTimeOpen
           : {
               start: '00:00',
               end: '23:59',
@@ -149,25 +154,27 @@ export const usePlaceForm = (t, place = null, photos = [], poolDocument = '', ch
 
       // if land
       landInFaceOfStreet: place?.landInFaceOfStreet || 'لا', // هل الارض امامها شارع (نعم/لا)
-      numberOfStreetsInLand: place?.numberOfStreetsInLand ? Number(place?.numberOfStreetsInLand) : 0, // عدد الشوارع امام الارض (رقم)
+      numberOfStreetsInLand: place?.numberOfStreetsInLand
+        ? Number(place?.numberOfStreetsInLand)
+        : 0, // عدد الشوارع امام الارض (رقم)
 
       // if apartment or house/villa
       numberOfRooms:
-        place?.number_of_rooms?.length > 2
-          ? JSON.parse(JSON.parse(place?.number_of_rooms))
+        Object.keys(oldNumberOfRooms).length > 0
+          ? oldNumberOfRooms
           : {
               // عدد الغرف لازم تكون زي هيك
-              kitchen: "",
-              rooms: "",
-              bathroom: "",
-              stages: "", // if villa or house
+              kitchen: '',
+              rooms: '',
+              bathroom: '',
+              stages: '', // if villa or house
             },
 
       // if apartment
       numberOfHomeStage: place?.numberOfHomeStage
         ? Number(place?.numberOfHomeStage)
-        : "", // الشقة في الطابق رقم (رقم)
-      totalStages: place?.totalStages ? Number(place?.totalStages) : "", // عدد الطوابق في البيت (رقم)
+        : '', // الشقة في الطابق رقم (رقم)
+      totalStages: place?.totalStages ? Number(place?.totalStages) : '', // عدد الطوابق في البيت (رقم)
 
       // if trip
       tripLong: place?.tripLong || '', // مدة الرحلة(15days / 1month )
@@ -178,7 +185,7 @@ export const usePlaceForm = (t, place = null, photos = [], poolDocument = '', ch
 
       // if meeting room
       meetingRoomType: place?.meetingRoomType || '', // نوع غرفة الاجتماعات اختياري بين الانواع التالية :[  "غرفة على شكل U","مسرح","قاعة درس","مكان للعمل الجماعي","بيانات"]
-      countPeople: place?.countPeople ? Number(place?.countPeople) : "", // عدد الاشخاص المسموح بيهم في غرفة الاجتماعات (رقم)
+      countPeople: place?.countPeople ? Number(place?.countPeople) : '', // عدد الاشخاص المسموح بيهم في غرفة الاجتماعات (رقم)
 
       // if gym
       subscriptionTypeGym: place?.subscriptionTypeGym || 'شهر', // نوع الاشتراك في الصالة الرياضية: [شهر, تلاتة اشهر,سنة
@@ -188,12 +195,19 @@ export const usePlaceForm = (t, place = null, photos = [], poolDocument = '', ch
       folderName: place?.folderName || undefined,
     },
   });
+};
 
 /**
  * Context
  */
 
-export const PlaceFormProvider = ({ children, place = null, photos = [], poolDocument = '', chaletDocument = '' }) => {
+export const PlaceFormProvider = ({
+  children,
+  place = null,
+  photos = [],
+  poolDocument = '',
+  chaletDocument = '',
+}) => {
   const { t } = useTranslation();
   const methods = usePlaceForm(t, place, photos, poolDocument, chaletDocument);
   return <FormProvider {...methods}> {children} </FormProvider>;

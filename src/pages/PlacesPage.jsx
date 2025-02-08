@@ -51,13 +51,6 @@ const PlacesPage = () => {
     <div>
       <AccountNav />
       <div className="text-center ">
-        {/* <Link
-          className="inline-flex gap-1 rounded-full bg-primary px-6 py-2 text-white"
-          to={'/account/places/new'}
-        > */}
-        {/* <InstallModal text={"قم بتحميل تطبيق سكني لكي تستطيع نشر اعلاناتك "} /> */}
-        {/* </Link> */}
-
         <Button
           asChild
           className="gap-2 rounded-full px-2 md:flex md:items-center md:px-3 max-w-sm mx-auto"
