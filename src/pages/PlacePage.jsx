@@ -30,7 +30,7 @@ import {
   WhatsApp,
 } from '@mui/icons-material';
 import axios from 'axios';
-import { format, formatDistance } from 'date-fns';
+import { format, formatDistance, parseISO } from 'date-fns';
 import { arSA, enUS } from 'date-fns/locale';
 import { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
@@ -549,7 +549,7 @@ export default function PlacePageNew() {
                                     className="flex items-center gap-1 rounded-sm border px-2 py-1"
                                   >
                                     <span className="font-bold">
-                                      {format(dayPrice[0], 'PPPP', {
+                                      {format(parseISO(dayPrice[0]), 'PPPP', {
                                         locale:
                                           currentLanguage === 'ar'
                                             ? arSA
