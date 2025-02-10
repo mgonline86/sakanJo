@@ -130,18 +130,6 @@ export default function PlacePageNew() {
 
   const amenities = JSON.parse(JSON.parse(place.amenities));
 
-  const getDocument = (folderName, document) => {
-    if (!document || !folderName) return;
-    // check file extension
-    const isPDF = document.split('.').pop() === 'pdf';
-
-    if (isPDF) {
-      return `https://backend.sakanijo.com/api/images/${encodeURIComponent(folderName)}/${encodeURIComponent(document)}`;
-    }
-
-    return `https://backend.sakanijo.com/api/images/${encodeURIComponent(folderName)}/${encodeURIComponent(document)}`;
-  };
-
   const [timeStart, timeEnd] = (() => {
     if (place?.timeOpen?.length > 2) {
       const { start, end } = JSON.parse(place.timeOpen);
@@ -623,36 +611,18 @@ export default function PlacePageNew() {
             )}
 
           {/* POOL */}
-          {place?.home_type === 'مسابح' && (
+          {place?.home_type === 'مسابح' && place?.deepPool && (
             <>
-              {(place?.deepPool ||
-                (place?.poolDocument && place?.folderName)) && <hr />}
+              <hr />
               <div className="my-4 flex flex-wrap gap-2">
-                {place?.deepPool && (
-                  <div className="flex min-w-fit flex-1 flex-col gap-1">
-                    <span className="text-sm text-muted-foreground">
-                      عمق المسبح
-                    </span>
-                    <span className="max-w-fit rounded-sm bg-gray-100 px-2 py-1">
-                      {place.deepPool}
-                    </span>
-                  </div>
-                )}
-                {place?.poolDocument && place?.folderName && (
-                  <div className="flex min-w-fit flex-1 flex-col gap-1">
-                    <span className="text-sm text-muted-foreground">
-                      مستند المسبح
-                    </span>
-                    <a
-                      className="max-w-fit rounded-sm bg-gray-100 px-2 py-1"
-                      href={getDocument(place.folderName, place.poolDocument)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <FileOpen />
-                    </a>
-                  </div>
-                )}
+                <div className="flex min-w-fit flex-1 flex-col gap-1">
+                  <span className="text-sm text-muted-foreground">
+                    عمق المسبح
+                  </span>
+                  <span className="max-w-fit rounded-sm bg-gray-100 px-2 py-1">
+                    {place.deepPool}
+                  </span>
+                </div>
               </div>
             </>
           )}
@@ -807,33 +777,6 @@ export default function PlacePageNew() {
               </div>
             </>
           )}
-
-          {/* CHALET */}
-          {place?.home_type === 'شليهات' &&
-            place?.challetDocument &&
-            place?.folderName && (
-              <>
-                <hr />
-                <div className="my-4 flex flex-wrap gap-2">
-                  <div className="flex min-w-fit flex-1 flex-col gap-1">
-                    <span className="text-sm text-muted-foreground">
-                      مستند الشليه
-                    </span>
-                    <a
-                      className="max-w-fit rounded-sm bg-gray-100 px-2 py-1"
-                      href={getDocument(
-                        place.folderName,
-                        place.challetDocument,
-                      )}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <FileOpen />
-                    </a>
-                  </div>
-                </div>
-              </>
-            )}
 
           {/* MEETING ROOMS */}
           {place?.home_type === 'قاعات اجتماعات' && (
